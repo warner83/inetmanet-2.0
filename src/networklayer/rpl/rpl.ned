@@ -1,6 +1,4 @@
 //
-// Copyright (C) 2012 Jonas Hartwig, BTU Cottbus
-//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,21 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.networklayer.sixlowpan;
+package inet.networklayer.rpl;
 
-//
-// Implements the wrapper for Contiki's 6LoWPAN protocol implementation.
-//
-// The 6LoWPAN packet is represented by the _6lowpanDatagram message class.
-//
-simple sixlowpan 
-{
+simple Rpl{
     parameters:
-        @class(sixlowpan);
-        int fragmentDelay = default(1);
+        @display("i=block/control");
+                
     gates:
-        input fromIPv6[];
-        output toIPv6[];
-        input fromMac[];
-        output toMac[];
+        input ipv6In;
+        output ipv6Out;
 }

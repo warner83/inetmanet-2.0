@@ -87,5 +87,9 @@ simple IPv6
         //the following gates are added by Zarrar Yousaf on 19.06.07
         input xMIPv6In;
         output xMIPv6Out;
+        
+        // added by Carlo Vallati for RPL protocol implementation
+        input rplIn;
+        output rplOut;
 }
 

@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
-package inet.examples.wpan.sixlowpan;
+package inet.examples.wpan.rpl;
 
 import inet.applications.IPingApp;
 import inet.applications.ITCPApp;
@@ -162,11 +162,11 @@ module nodecsma802154
         }
         networkLayer.transportOut++ --> manetrouting.from_ip if routingProtocol != "";
         networkLayer.transportIn++ <-- manetrouting.to_ip if routingProtocol != "";
- 
+
         // connections to network outside
         radioIn --> wlan.radioIn;
         wlan.upperLayerOut --> networkLayer.ifIn++;
-        wlan.upperLayerIn <-- networkLayer.ifOut++;     
+        wlan.upperLayerIn <-- networkLayer.ifOut++;
 
 }
 
