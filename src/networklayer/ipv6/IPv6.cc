@@ -44,6 +44,8 @@
 #include "ModuleAccess.h"
 #include "NodeStatus.h"
 
+#include "RPLmessage_m.h"
+
 #define FRAGMENT_TIMEOUT 60   // 60 sec, from IPv6 RFC
 
 
@@ -138,6 +140,7 @@ void IPv6::endService(cPacket *msg)
             || (msg->getArrivalGate()->isName("ndIn") && dynamic_cast<IPv6NDMessage*>(msg))
             || (msg->getArrivalGate()->isName("icmpIn") && dynamic_cast<ICMPv6Message*>(msg)) //Added this for ICMP msgs from ICMP module-WEI
             || (msg->getArrivalGate()->isName("upperTunnelingIn")) // for tunneling support-CB
+            || (msg->getArrivalGate()->isName("rplIn") && dynamic_cast<RPLmessage*>(msg))
 #ifdef WITH_xMIPv6
             || (msg->getArrivalGate()->isName("xMIPv6In") && dynamic_cast<MobilityHeader*>(msg)) // Zarrar
 #endif /* WITH_xMIPv6 */
@@ -568,7 +571,16 @@ void IPv6::localDeliver(IPv6Datagram *datagram)
         }
     }
 #endif /* WITH_xMIPv6 */
-    else if (protocol == IP_PROT_IPv6_ICMP && dynamic_cast<ICMPv6Message*>(packet))
+    // RPL messages mgmt
+    else if (protocol==IP_PROT_IPv6_ICMP && dynamic_cast<RPLmessage*>(packet)){
+        EV << "RPL message received\n";
+
+        // Fill mgmt information
+        RPLmessage *rplMessage = check_and_cast<RPLmessage *>(packet);
+        rplMessage->setSrc(datagram->getSrcAddress());
+
+        send(packet, "rplOut");
+    } else if (protocol == IP_PROT_IPv6_ICMP && dynamic_cast<ICMPv6Message*>(packet))
     {
         handleReceivedICMP(dynamic_cast<ICMPv6Message*>(packet));
     }//Added by WEI to forward ICMPv6 msgs to ICMPv6 module.

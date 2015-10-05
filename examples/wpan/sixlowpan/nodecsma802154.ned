@@ -35,7 +35,7 @@ import inet.wpan.Isabel.Base.Display;
 import inet.linklayer.loopback.LoopbackInterface;
 
 import inet.networklayer.ipv6.RoutingTable6;
-import inet.nodes.rpl.NetworkLayer6Rpl;
+import inet.nodes.rpl.NetworkLayer6RplSix;
 
 //
 // Models a mobile host with a wireless (802.11b) card. This module is
@@ -100,7 +100,7 @@ module nodecsma802154
             parameters:
                 @display("p=501,230");
         }
-        networkLayer: NetworkLayer6Rpl {
+        networkLayer: NetworkLayer6RplSix {
             parameters:
                 @display("p=248,247;i=block/fork;q=queue");
             gates:

@@ -36,7 +36,7 @@ import inet.base.IHook;
 // The module has ports to connect to a higher layer (TCP, UDP) and
 // several network interfaces.
 //
-module NetworkLayer6Rpl
+module NetworkLayer6RplSix
 {
     parameters:
         bool xMIPv6Support = default(false);
@@ -81,6 +81,15 @@ module NetworkLayer6Rpl
             @display("p=181,205;is=s");
         }
 
+        six: sixlowpan {
+            @display("p=135,251;is=s");
+            gates:
+                fromIPv6[sizeof(ifIn)];
+                toIPv6[sizeof(ifIn)];
+                fromMac[sizeof(ifIn)];
+                toMac[sizeof(ifIn)];
+        }
+
     connections allowunconnected:  // FIXME remove 'nocheck'!
         for i=0..sizeof(transportIn)-1 {
             transportIn[i] --> { @display("m=n"); } --> ipv6.transportIn++;
@@ -119,11 +128,21 @@ module NetworkLayer6Rpl
         ipv6.xMIPv6In <-- mipv6support.toIPv6;
 
         // IPv6 to L2
+        //for i=0..sizeof(ifIn)-1 {
+        //    ifIn[i] --> { @display("m=s"); } --> ipv6.queueIn[i];
+        //}
+        //for i=0..sizeof(ifOut)-1 {
+        //    ipv6.queueOut[i] --> { @display("m=s"); } --> ifOut[i];
+        //}
+
         for i=0..sizeof(ifIn)-1 {
-            ifIn[i] --> { @display("m=s"); } --> ipv6.queueIn[i];
+            ifIn[i] --> six.fromMac[i];
+            six.toIPv6[i] --> { @display("m=s"); } --> ipv6.queueIn[i];
         }
+
         for i=0..sizeof(ifOut)-1 {
-            ipv6.queueOut[i] --> { @display("m=s"); } --> ifOut[i];
+            ipv6.queueOut[i] --> six.fromIPv6[i];
+            six.toMac[i] --> { @display("m=s"); } --> ifOut[i];
         }
 
 		rpl.ipv6Out --> ipv6.rplIn;

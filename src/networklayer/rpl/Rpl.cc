@@ -15,6 +15,11 @@
 
 #include <Rpl.h>
 
+#include "RPLmessage_m.h"
+#include "DIOmessage_m.h"
+#include "ICMPv6Message_m.h"
+#include "IPv6Datagram.h"
+
 Define_Module(Rpl);
 
 Rpl::Rpl() {
@@ -26,3 +31,87 @@ Rpl::~Rpl() {
     // TODO Auto-generated destructor stub
 }
 
+void Rpl::trickleInitialize(){
+    simtime_t nextInterval = simTime() + 5; // TEST only, fixed 5 secs
+
+    // Initialize the timer
+    I_timer = new cMessage();
+    I_timer->setKind(I_timer_kind_self_message);
+    scheduleAt(nextInterval, I_timer);
+
+    EV << "RPL: Trickle timer initialized, I=" << nextInterval << endl;
+}
+
+void Rpl::initialize(int stage)
+{
+    if(stage == 0){
+
+        EV<<"RPL: Trickle initialization\n";
+        // Initialize trickle
+        trickleInitialize();
+    } else if(stage == 3){
+
+        EV<<"RPL: Recover system pointers\n";
+        // Recover system pointers
+        ift = InterfaceTableAccess().get(); // Interface table
+        ie = ift->getInterface(WPAN_INTERFACE); // WPAN interface entry
+    }
+}
+
+void Rpl::handleMessage(cMessage *msg)
+{
+
+    if (!msg->isSelfMessage())
+    {
+        EV<<"RPL: RPL message received\n";
+
+        RPLmessage *rplMessage = check_and_cast<RPLmessage *>(msg);
+
+        if(rplMessage->getCode() == DIO){
+            DIOmessage *dioMessage = check_and_cast<DIOmessage *>(msg);
+            EV<<"RPL: DIO message received from " << rplMessage->getSrc().str() << " DODAGID " << dioMessage->getDODAGID().str() << " rank " << dioMessage->getRank() << endl;
+        }
+
+    }
+    else
+    {
+
+        if (msg->getKind()==I_timer_kind_self_message) // Interval just ended
+            intervalEnded();
+
+    }
+}
+
+void Rpl::intervalEnded(){
+    EV<<"RPL: Interval ended" << endl;
+
+    EV<<"RPL: Sending DIOmessage" << endl;
+
+    sendDioOut();
+}
+
+void Rpl::sendDioOut(){
+    // Create the DIO message
+    DIOmessage *dioMessage = new DIOmessage();
+    dioMessage->setType(ICMPv6_RPL);
+    dioMessage->setCode(DIO);
+    dioMessage->setRank(0); // TODO set rank
+    //dioMessage->setDODAGID(myAddress); // TODO set DODAGID
+
+    // Set IPV6 header fields
+    IPv6Address dest=IPv6Address("FF02::1"); // IPv6 link-local multicast!
+    IPv6Address src=ie->ipv6Data()->getLinkLocalAddress();
+
+    IPv6ControlInfo *ctrlInfo = new IPv6ControlInfo();
+    ctrlInfo->setDestAddr(dest);
+    ctrlInfo->setSrcAddr(src);
+    ctrlInfo->setProtocol(IP_PROT_IPv6_ICMP);
+
+    dioMessage->setControlInfo(ctrlInfo);
+
+    // Set pkt len TODO set it automatically
+    dioMessage->setByteLength(DIO_LEN);
+
+    // Send the packet out!
+    send(PK(dioMessage),"ipv6Out");
+}
