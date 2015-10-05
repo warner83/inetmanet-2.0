@@ -575,7 +575,7 @@ void IPv6::localDeliver(IPv6Datagram *datagram)
     else if (protocol==IP_PROT_IPv6_ICMP && dynamic_cast<RPLmessage*>(packet)){
         EV << "RPL message received\n";
 
-        // Fill mgmt information
+        // Fill mgmt information TODO find a better way!
         RPLmessage *rplMessage = check_and_cast<RPLmessage *>(packet);
         rplMessage->setSrc(datagram->getSrcAddress());
 

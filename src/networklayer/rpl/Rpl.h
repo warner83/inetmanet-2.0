@@ -25,17 +25,26 @@
 #include "InterfaceTableAccess.h"
 #include "IPv6ControlInfo.h"
 
-#define I_timer_kind_self_message         1
+#define trickle_init_timer_kind_self_message         1
 
 #define WPAN_INTERFACE 0
 
 #define DIO_LEN         28 // TODO check this!!
+
+class TrickleBase;
 
 class Rpl : public cSimpleModule {
 
     ///////////  System pointers  ///////////
     IInterfaceTable *ift; // Pointer to the interface table
     InterfaceEntry* ie; // Pointer to the WPAN interface entry
+
+    ///////////  Internal structures  ///////////
+
+    cMessage *trickle_init_timer;
+
+    // Trickle timer
+    TrickleBase* trickle;
 
     ///////////  RPL functions  ///////////
     void initialize(int stage);
@@ -44,11 +53,7 @@ class Rpl : public cSimpleModule {
 
     void handleMessage(cMessage *msg);
 
-    void sendDioOut();
-
-    ///////////  Trickle functions  ///////////
-
-    cMessage *I_timer;
+    ///////////  Trickle interface functions  ///////////
 
     void trickleInitialize();
 
@@ -57,6 +62,10 @@ class Rpl : public cSimpleModule {
 public:
     Rpl();
     virtual ~Rpl();
+
+    // Send out a DIO message, used by trickle implementations
+    void sendDioOut();
+
 };
 
 #endif /* RPL_H_ */

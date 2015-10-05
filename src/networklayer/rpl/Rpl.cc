@@ -20,33 +20,38 @@
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
 
+#include "trickle/TrickleNormal.h"
+
 Define_Module(Rpl);
 
 Rpl::Rpl() {
-    // TODO Auto-generated constructor stub
+
+    // Allocate Trickle timer
+    trickle = new TrickleNormal(this, 1, 20, 2); // TODO allocate different trickle timers according to param, TODO fetch params
 
 }
 
 Rpl::~Rpl() {
-    // TODO Auto-generated destructor stub
+    delete trickle;
 }
 
 void Rpl::trickleInitialize(){
-    simtime_t nextInterval = simTime() + 5; // TEST only, fixed 5 secs
+    simtime_t initAbsTime = simTime() + 5; // TEST only, fixed 5 secs
 
     // Initialize the timer
-    I_timer = new cMessage();
-    I_timer->setKind(I_timer_kind_self_message);
-    scheduleAt(nextInterval, I_timer);
+    trickle_init_timer = new cMessage();
+    trickle_init_timer->setKind(trickle_init_timer_kind_self_message);
+    scheduleAt(initAbsTime, trickle_init_timer);
 
-    EV << "RPL: Trickle timer initialized, I=" << nextInterval << endl;
+    EV << "RPL: Trickle timer will be initialized at " << initAbsTime << endl;
 }
 
 void Rpl::initialize(int stage)
 {
     if(stage == 0){
 
-        EV<<"RPL: Trickle initialization\n";
+        EV<<"RPL: Triger trickle initialization\n";
+
         // Initialize trickle
         trickleInitialize();
     } else if(stage == 3){
@@ -70,25 +75,25 @@ void Rpl::handleMessage(cMessage *msg)
         if(rplMessage->getCode() == DIO){
             DIOmessage *dioMessage = check_and_cast<DIOmessage *>(msg);
             EV<<"RPL: DIO message received from " << rplMessage->getSrc().str() << " DODAGID " << dioMessage->getDODAGID().str() << " rank " << dioMessage->getRank() << endl;
+
+            // TODO check consistency
+
+            // Signal trickle that a message has been received
+            trickle->dioReceived();
         }
 
     }
     else
     {
-
-        if (msg->getKind()==I_timer_kind_self_message) // Interval just ended
-            intervalEnded();
+        // Timer trickle initialization
+        if (msg->getKind()==trickle_init_timer_kind_self_message) {
+            trickle->initializeTrickle();
+        }
 
     }
 }
 
-void Rpl::intervalEnded(){
-    EV<<"RPL: Interval ended" << endl;
 
-    EV<<"RPL: Sending DIOmessage" << endl;
-
-    sendDioOut();
-}
 
 void Rpl::sendDioOut(){
     // Create the DIO message
@@ -111,6 +116,8 @@ void Rpl::sendDioOut(){
 
     // Set pkt len TODO set it automatically
     dioMessage->setByteLength(DIO_LEN);
+
+    EV << "RPL: DIO message with rank " << 0 << endl; // TODO change rank
 
     // Send the packet out!
     send(PK(dioMessage),"ipv6Out");
