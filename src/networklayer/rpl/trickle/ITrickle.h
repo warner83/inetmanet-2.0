@@ -5,14 +5,17 @@
  *      Author: carlo
  */
 
-#ifndef TRICKLEBASE_H_
-#define TRICKLEBASE_H_
+#ifndef ITRICKLE_H_
+#define ITRICKLE_H_
 
 #include <omnetpp.h>
 
+#include "INETDefs.h"
+
+
 class RplEngine;
 
-class ITrickle {
+class INET_API ITrickle {
 
 
 protected:
@@ -34,4 +37,4 @@ public:
 
 };
 
-#endif /* TRICKLEBASE_H_ */
+#endif /* ITRICKLE_H_ */

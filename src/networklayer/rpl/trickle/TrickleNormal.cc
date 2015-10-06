@@ -24,7 +24,7 @@
 Define_Module(TrickleNormal);
 
 TrickleNormal::TrickleNormal()  {
-    // Nothing to do here
+    EV << "Trickle: Node configured with trickle normal! " << endl;
 }
 
 TrickleNormal::~TrickleNormal() {

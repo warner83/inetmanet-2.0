@@ -20,7 +20,7 @@ import inet.networklayer.rpl.trickle.ITrickle;
 //
 // TODO auto-generated type
 //
-module TrickleNormal like ITrickle
+simple TrickleNormal like ITrickle
 {
        parameters:
             @display("i=block/cogwheel_s");

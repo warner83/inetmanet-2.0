@@ -7,6 +7,7 @@
 
 #include <trickle/ITrickle.h>
 
+Register_Abstract_Class(ITrickle);
 
 ITrickle::ITrickle() {
 }

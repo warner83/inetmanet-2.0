@@ -25,15 +25,13 @@
 #include "InterfaceTableAccess.h"
 #include "IPv6ControlInfo.h"
 
-#define trickle_init_timer_kind_self_message         1
-
 #define WPAN_INTERFACE 0
 
 #define DIO_LEN         28 // TODO check this!!
 
 class ITrickle;
 
-class RplEngine : public cSimpleModule {
+class INET_API RplEngine : public cSimpleModule {
 
     ///////////  System pointers  ///////////
     IInterfaceTable *ift; // Pointer to the interface table
@@ -42,18 +40,19 @@ class RplEngine : public cSimpleModule {
     ///////////  Internal structures  ///////////
 
     // Trickle timer
-    ITrickle* trickle;
+    ITrickle* trickleTimer;
+
+    // My IPv6 address
+    IPv6Address myIp;
 
     ///////////  RPL functions  ///////////
     void initialize(int stage);
 
-    virtual int numInitStages()const { return 4;}
+    virtual int numInitStages()const { return 4; }
 
     void handleMessage(cMessage *msg);
 
     ///////////  Trickle interface functions  ///////////
-
-    void trickleInitialize();
 
     void intervalEnded();
 

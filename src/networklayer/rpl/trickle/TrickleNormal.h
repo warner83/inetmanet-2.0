@@ -20,7 +20,8 @@
 
 #include <trickle/ITrickle.h>
 
-class TrickleNormal: public cSimpleModule, public ITrickle {
+
+class INET_API TrickleNormal: public cSimpleModule, public ITrickle {
 
     // Initial interval
     double minInt;
@@ -68,7 +69,8 @@ class TrickleNormal: public cSimpleModule, public ITrickle {
 
     // Initialize timers
     void initialize(int stage);
-    virtual int numInitStages()const { return 1;}
+
+    virtual int numInitStages()const { return 4;}
 
     // Called when trickle is initialized
     virtual void initializeTrickle();

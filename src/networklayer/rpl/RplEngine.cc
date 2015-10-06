@@ -33,24 +33,23 @@ RplEngine::~RplEngine() {
 
 void RplEngine::initialize(int stage)
 {
-    if(stage == 0){
-
-        EV<<"RPL: Triger trickle initialization\n";
-
-        // Initialize trickle
-        trickleInitialize();
-    } else if(stage == 3){
+    if(stage == 3){
 
         EV<<"RPL: Recover system pointers\n";
-        // Recover system pointers
+
+        // Recover system pointers and my address
         ift = InterfaceTableAccess().get(); // Interface table
         ie = ift->getInterface(WPAN_INTERFACE); // WPAN interface entry
+        myIp = ie->ipv6Data()->getLinkLocalAddress();
+
+        EV <<"RPL: My IPv6 is " << myIp.str() << endl;
 
         // TODO check this mess...
         cModule* parent = getParentModule();
         if( parent->findSubmodule("trickle") >= 0 ){
             cModule* mod = parent->getSubmodule("trickle");
-            trickle = (ITrickle *) mod; // Trickle instance
+            trickleTimer = (ITrickle *) mod; // Trickle instance
+            trickleTimer->setRplPtr(this); // Set myself for callback
         }
         else {
             EV << "No trickle found in " << getParentModule()->getFullPath() << endl;
@@ -75,7 +74,7 @@ void RplEngine::handleMessage(cMessage *msg)
             // TODO check consistency
 
             // Signal trickle that a message has been received
-            trickle->dioReceived();
+            trickleTimer->dioReceived();
         }
 
     }
@@ -89,6 +88,10 @@ void RplEngine::handleMessage(cMessage *msg)
 
 void RplEngine::sendDioOut(){
 
+    EV << "RPL: DIO message with rank " << 0 << endl; // TODO change rank
+
+    Enter_Method_Silent();
+
     // Create the DIO message
     DIOmessage *dioMessage = new DIOmessage();
     dioMessage->setType(ICMPv6_RPL);
@@ -98,19 +101,16 @@ void RplEngine::sendDioOut(){
 
     // Set IPV6 header fields
     IPv6Address dest=IPv6Address("FF02::1"); // IPv6 link-local multicast!
-    IPv6Address src=ie->ipv6Data()->getLinkLocalAddress();
 
     IPv6ControlInfo *ctrlInfo = new IPv6ControlInfo();
     ctrlInfo->setDestAddr(dest);
-    ctrlInfo->setSrcAddr(src);
+    ctrlInfo->setSrcAddr(myIp);
     ctrlInfo->setProtocol(IP_PROT_IPv6_ICMP);
 
     dioMessage->setControlInfo(ctrlInfo);
 
     // Set pkt len TODO set it automatically
     dioMessage->setByteLength(DIO_LEN);
-
-    EV << "RPL: DIO message with rank " << 0 << endl; // TODO change rank
 
     // Send the packet out!
     send(PK(dioMessage),"ipv6Out");

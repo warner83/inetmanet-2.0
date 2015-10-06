@@ -16,6 +16,7 @@
 package inet.networklayer.rpl;
 
 import inet.networklayer.rpl.trickle.ITrickle;
+import inet.networklayer.rpl.trickle.TrickleNormal;
 import inet.networklayer.rpl.RplEngine;
 
 module RplRouting
