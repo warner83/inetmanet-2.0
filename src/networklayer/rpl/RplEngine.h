@@ -31,9 +31,9 @@
 
 #define DIO_LEN         28 // TODO check this!!
 
-class TrickleBase;
+class ITrickle;
 
-class Rpl : public cSimpleModule {
+class RplEngine : public cSimpleModule {
 
     ///////////  System pointers  ///////////
     IInterfaceTable *ift; // Pointer to the interface table
@@ -41,10 +41,8 @@ class Rpl : public cSimpleModule {
 
     ///////////  Internal structures  ///////////
 
-    cMessage *trickle_init_timer;
-
     // Trickle timer
-    TrickleBase* trickle;
+    ITrickle* trickle;
 
     ///////////  RPL functions  ///////////
     void initialize(int stage);
@@ -60,8 +58,8 @@ class Rpl : public cSimpleModule {
     void intervalEnded();
 
 public:
-    Rpl();
-    virtual ~Rpl();
+    RplEngine();
+    virtual ~RplEngine();
 
     // Send out a DIO message, used by trickle implementations
     void sendDioOut();

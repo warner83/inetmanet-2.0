@@ -13,40 +13,25 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include <Rpl.h>
+#include <RplEngine.h>
 
 #include "RPLmessage_m.h"
 #include "DIOmessage_m.h"
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
 
+#include "trickle/ITrickle.h"
 #include "trickle/TrickleNormal.h"
 
-Define_Module(Rpl);
+Define_Module(RplEngine);
 
-Rpl::Rpl() {
-
-    // Allocate Trickle timer
-    trickle = new TrickleNormal(this, 1, 20, 2); // TODO allocate different trickle timers according to param, TODO fetch params
-
+RplEngine::RplEngine() {
 }
 
-Rpl::~Rpl() {
-    delete trickle;
+RplEngine::~RplEngine() {
 }
 
-void Rpl::trickleInitialize(){
-    simtime_t initAbsTime = simTime() + 5; // TEST only, fixed 5 secs
-
-    // Initialize the timer
-    trickle_init_timer = new cMessage();
-    trickle_init_timer->setKind(trickle_init_timer_kind_self_message);
-    scheduleAt(initAbsTime, trickle_init_timer);
-
-    EV << "RPL: Trickle timer will be initialized at " << initAbsTime << endl;
-}
-
-void Rpl::initialize(int stage)
+void RplEngine::initialize(int stage)
 {
     if(stage == 0){
 
@@ -60,10 +45,21 @@ void Rpl::initialize(int stage)
         // Recover system pointers
         ift = InterfaceTableAccess().get(); // Interface table
         ie = ift->getInterface(WPAN_INTERFACE); // WPAN interface entry
+
+        // TODO check this mess...
+        cModule* parent = getParentModule();
+        if( parent->findSubmodule("trickle") >= 0 ){
+            cModule* mod = parent->getSubmodule("trickle");
+            trickle = (ITrickle *) mod; // Trickle instance
+        }
+        else {
+            EV << "No trickle found in " << getParentModule()->getFullPath() << endl;
+            abort();
+        }
     }
 }
 
-void Rpl::handleMessage(cMessage *msg)
+void RplEngine::handleMessage(cMessage *msg)
 {
 
     if (!msg->isSelfMessage())
@@ -85,17 +81,14 @@ void Rpl::handleMessage(cMessage *msg)
     }
     else
     {
-        // Timer trickle initialization
-        if (msg->getKind()==trickle_init_timer_kind_self_message) {
-            trickle->initializeTrickle();
-        }
-
+        // Self messages?
     }
 }
 
 
 
-void Rpl::sendDioOut(){
+void RplEngine::sendDioOut(){
+
     // Create the DIO message
     DIOmessage *dioMessage = new DIOmessage();
     dioMessage->setType(ICMPv6_RPL);
@@ -121,4 +114,5 @@ void Rpl::sendDioOut(){
 
     // Send the packet out!
     send(PK(dioMessage),"ipv6Out");
+
 }

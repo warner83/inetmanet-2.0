@@ -15,11 +15,32 @@
 
 package inet.networklayer.rpl;
 
-simple Rpl{
+import inet.networklayer.rpl.trickle.ITrickle;
+import inet.networklayer.rpl.RplEngine;
+
+module RplRouting
+{
     parameters:
         @display("i=block/control");
-                
+
+        string trickleType = default("TrickleNormal"); // type of the Trickle implementation
+
     gates:
         input ipv6In;
         output ipv6Out;
+
+    submodules:
+        trickle: <trickleType> like ITrickle {
+            parameters:
+                @display("p=252,43");
+        }
+
+        rplEngine: RplEngine {
+            parameters:
+                @display("p=141,43");
+        }
+
+    connections:
+        ipv6In --> rplEngine.ipv6In;
+        ipv6Out <-- rplEngine.ipv6Out;
 }

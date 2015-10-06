@@ -26,7 +26,7 @@ import inet.networklayer.icmpv6.ICMPv6;
 import inet.networklayer.IxMIPv6Support;
 import inet.networklayer.IIPv6Tunneling;
 import inet.networklayer.sixlowpan.sixlowpan;
-import inet.networklayer.rpl.Rpl;
+import inet.networklayer.rpl.RplRouting;
 import inet.base.IHook;
 
 
@@ -77,7 +77,7 @@ module NetworkLayer6RplSix
                 @display("p=44,79");
         }
 
-        rpl: Rpl {
+        rpl: RplRouting {
             @display("p=181,205;is=s");
         }
 

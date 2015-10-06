@@ -18,9 +18,9 @@
 #ifndef TRICKLENORMAL_H_
 #define TRICKLENORMAL_H_
 
-#include <trickle/TrickleBase.h>
+#include <trickle/ITrickle.h>
 
-class TrickleNormal: public TrickleBase {
+class TrickleNormal: public cSimpleModule, public ITrickle {
 
     // Initial interval
     double minInt;
@@ -40,19 +40,43 @@ class TrickleNormal: public TrickleBase {
     // Current number of doublings
     unsigned int curDoublings;
 
-    virtual void intervalEnded();
+    ////////// Timers //////////
 
-    virtual void messageFired();
+    cMessage *trickle_interval_timer;
+    cMessage *trickle_message_timer;
+    cMessage *trickle_init_timer;
+
+    // Schedule message at
+    void scheduleMessageAt(double t);
+
+    // Schedule interval end at
+    void scheduleIntervalAt(double t);
+
+    // Cancel all the scheduled timers
+    void cancelAllTimers();
+
+    ////////// Internal interfaces //////////
+
+    // Self-called when the interval ends
+    void intervalEnded();
+
+    // Self-called when message timer fires
+    void messageFired();
+
+    // Handle self-messages for timing
+    void handleMessage(cMessage *msg);
+
+    // Initialize timers
+    void initialize(int stage);
+    virtual int numInitStages()const { return 1;}
+
+    // Called when trickle is initialized
+    virtual void initializeTrickle();
 
 public:
-    TrickleNormal(Rpl* r, double minI, unsigned int numDoubl, unsigned int k) : TrickleBase(r) {
-        minInt = minI;
-        maxDoublings = numDoubl;
-        redundancy = k;
-    }
-    virtual ~TrickleNormal();
+    TrickleNormal() ;
 
-    virtual void initializeTrickle();
+    virtual ~TrickleNormal();
 
     virtual void reset();
 
