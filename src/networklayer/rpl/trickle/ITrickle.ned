@@ -26,4 +26,8 @@ moduleinterface ITrickle
 			int redundancy;
 			int maxDoublings;
 			double initTime;
+			
+    gates:
+        	input engineIn;
+        	output engineOut;
 }

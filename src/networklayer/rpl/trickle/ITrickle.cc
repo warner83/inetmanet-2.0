@@ -15,8 +15,11 @@ ITrickle::ITrickle() {
 ITrickle::~ITrickle() {
 }
 
-void ITrickle::setRplPtr(RplEngine* r){
-    rpl = r;
+
+void ITrickle::signalEngine(int kind){
+    // Create a new message and send it out to the engine
+    cMessage* msg = new cMessage("",kind);
+    send(msg, "engineOut");
 }
 
 

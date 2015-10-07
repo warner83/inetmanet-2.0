@@ -20,8 +20,7 @@
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
 
-#include "trickle/ITrickle.h"
-#include "trickle/TrickleNormal.h"
+#include "trickle/TrickleEvents.h"
 
 Define_Module(RplEngine);
 
@@ -44,17 +43,6 @@ void RplEngine::initialize(int stage)
 
         EV <<"RPL: My IPv6 is " << myIp.str() << endl;
 
-        // TODO check this mess...
-        cModule* parent = getParentModule();
-        if( parent->findSubmodule("trickle") >= 0 ){
-            cModule* mod = parent->getSubmodule("trickle");
-            trickleTimer = (ITrickle *) mod; // Trickle instance
-            trickleTimer->setRplPtr(this); // Set myself for callback
-        }
-        else {
-            EV << "No trickle found in " << getParentModule()->getFullPath() << endl;
-            abort();
-        }
     }
 }
 
@@ -63,27 +51,49 @@ void RplEngine::handleMessage(cMessage *msg)
 
     if (!msg->isSelfMessage())
     {
-        EV<<"RPL: RPL message received\n";
+        if( strcmp(msg->getArrivalGate()->getFullName(), "ipv6In" ) == 0 ){
+            // Message form the network
 
-        RPLmessage *rplMessage = check_and_cast<RPLmessage *>(msg);
+            EV<<"RPL: RPL message received\n";
 
-        if(rplMessage->getCode() == DIO){
-            DIOmessage *dioMessage = check_and_cast<DIOmessage *>(msg);
-            EV<<"RPL: DIO message received from " << rplMessage->getSrc().str() << " DODAGID " << dioMessage->getDODAGID().str() << " rank " << dioMessage->getRank() << endl;
+            RPLmessage *rplMessage = check_and_cast<RPLmessage *>(msg);
 
-            // TODO check consistency
+            if(rplMessage->getCode() == DIO){
+                DIOmessage *dioMessage = check_and_cast<DIOmessage *>(msg);
+                EV<<"RPL: DIO message received from " << rplMessage->getSrc().str() << " DODAGID " << dioMessage->getDODAGID().str() << " rank " << dioMessage->getRank() << endl;
 
-            // Signal trickle that a message has been received
-            trickleTimer->dioReceived();
+                // TODO check consistency
+
+                // Signal trickle that a message has been received
+                signalTrickle(consistant_message_received);
+
+            } else {
+                EV << "RPL: unknown rpl message from network " << rplMessage->getCode() << endl;
+                abort();
+            }
+        } else if( strcmp(msg->getArrivalGate()->getFullName(), "trickleIn" ) == 0 ){
+            // Internal message from trickle
+            if( msg->getKind() == send_dio_message ){
+                // Fire a DIO message
+                sendDioOut();
+            } else {
+                EV << "RPL: unknown message from trickle " << msg->getKind() << endl;
+                abort();
+            }
         }
 
+        // Free memory
+        delete msg;
+
     }
-    else
-    {
-        // Self messages?
-    }
+
 }
 
+void RplEngine::signalTrickle(int kind){
+    // Create a new message and send it out to the engine
+    cMessage* msg = new cMessage("",kind);
+    send(msg, "trickleOut");
+}
 
 
 void RplEngine::sendDioOut(){

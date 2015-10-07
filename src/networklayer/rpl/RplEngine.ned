@@ -23,5 +23,8 @@ simple RplEngine{
     gates:
         input ipv6In;
         output ipv6Out;
+        
+        input trickleIn;
+        output trickleOut;
     
 }

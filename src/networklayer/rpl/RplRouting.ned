@@ -44,4 +44,7 @@ module RplRouting
     connections:
         ipv6In --> rplEngine.ipv6In;
         ipv6Out <-- rplEngine.ipv6Out;
+        
+        trickle.engineOut --> rplEngine.trickleIn;
+        trickle.engineIn <-- rplEngine.trickleOut;
 }

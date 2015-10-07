@@ -13,14 +13,10 @@
 #include "INETDefs.h"
 
 
-class RplEngine;
-
-class INET_API ITrickle {
-
+class INET_API ITrickle: public cSimpleModule {
 
 protected:
-
-    RplEngine* rpl;
+    void signalEngine(int kind);
 
 public:
     ITrickle();
@@ -31,9 +27,6 @@ public:
 
     // Called when a consistant packet is received
     virtual void dioReceived() = 0;
-
-    // Function to set pointer to RPL instance for callback
-    void setRplPtr(RplEngine* r);
 
 };
 

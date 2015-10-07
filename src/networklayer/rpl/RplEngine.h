@@ -29,8 +29,6 @@
 
 #define DIO_LEN         28 // TODO check this!!
 
-class ITrickle;
-
 class INET_API RplEngine : public cSimpleModule {
 
     ///////////  System pointers  ///////////
@@ -38,9 +36,6 @@ class INET_API RplEngine : public cSimpleModule {
     InterfaceEntry* ie; // Pointer to the WPAN interface entry
 
     ///////////  Internal structures  ///////////
-
-    // Trickle timer
-    ITrickle* trickleTimer;
 
     // My IPv6 address
     IPv6Address myIp;
@@ -52,9 +47,9 @@ class INET_API RplEngine : public cSimpleModule {
 
     void handleMessage(cMessage *msg);
 
-    ///////////  Trickle interface functions  ///////////
+    ///////////  Trickle event signal functions  ///////////
 
-    void intervalEnded();
+    void signalTrickle(int kind);
 
 public:
     RplEngine();

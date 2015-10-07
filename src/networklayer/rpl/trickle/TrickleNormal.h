@@ -21,7 +21,7 @@
 #include <trickle/ITrickle.h>
 
 
-class INET_API TrickleNormal: public cSimpleModule, public ITrickle {
+class INET_API TrickleNormal: public ITrickle {
 
     // Initial interval
     double minInt;

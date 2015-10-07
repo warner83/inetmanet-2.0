@@ -15,8 +15,9 @@
 
 #include <trickle/TrickleNormal.h>
 
-#include <RplEngine.h>
+#include <trickle/TrickleEvents.h>
 
+// Self timing messages
 #define trickle_interval_timer_kind_self_message         1
 #define trickle_message_timer_kind_self_message             2
 #define trickle_init_timer_kind_self_message            3
@@ -76,8 +77,17 @@ void TrickleNormal::cancelAllTimers(){
 void TrickleNormal::handleMessage(cMessage *msg)
 {
     if (!msg->isSelfMessage()){
-        error("Not self message within trickle");
+        // The message is from the rpl engine
+        if(msg->getKind()==consistant_message_received){
+            dioReceived();
+        } else if(msg->getKind()==rpl_reset){
+            reset();
+        }
+
+        // Delete only messages from other modules
+        delete msg;
     } else {
+        // Self message for internal timer
         if(msg->getKind()==trickle_interval_timer_kind_self_message){
             // Interval ended
             intervalEnded();
@@ -101,10 +111,14 @@ void TrickleNormal::initializeTrickle(){
     // Let's schedule the first message
     double nextMsg = simTime().dbl() + uniform(curInt / 2, curInt);
 
+    // Let's schedule the end of the interval
+    double nextInt = simTime().dbl() + curInt ;
+
     EV << "TrickleNormal: Initialization at " << simTime() << " completed first interval length " <<  curInt << " next message at " << nextMsg << endl;
 
     // Set the timer
     scheduleMessageAt(nextMsg);
+    scheduleIntervalAt(nextInt);
 
 }
 
@@ -140,6 +154,10 @@ void TrickleNormal::intervalEnded(){
     // Reset number of messages received
     numMessagesReceived = 0;
 
+    // Let's schedule the end of the interval
+    double nextInt = simTime().dbl() + curInt ;
+    scheduleIntervalAt(nextInt);
+
     EV << "TrickleNormal: Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
 }
 
@@ -148,7 +166,7 @@ void TrickleNormal::messageFired() {
         EV << "TrickleNormal: Sending DIO out received messages " << numMessagesReceived << endl;
 
         // Send out a DIO message only if the number of messages received is below the redundancy threshold
-        rpl->sendDioOut();
+        signalEngine(send_dio_message);
     } else {
         EV << "TrickleNormal: DIO suppressed " << numMessagesReceived << endl;
     }

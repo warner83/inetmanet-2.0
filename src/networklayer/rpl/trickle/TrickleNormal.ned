@@ -29,4 +29,8 @@ simple TrickleNormal like ITrickle
 			int maxDoublings = default(20);
 			
 			double initTime @unit("s") = default(1s);
+			
+		gates:
+        	input engineIn;
+        	output engineOut;
 }
