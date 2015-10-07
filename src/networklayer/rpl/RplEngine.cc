@@ -22,17 +22,41 @@
 
 #include "trickle/TrickleEvents.h"
 
+#define init_timer_kind_self_message        1
+
 Define_Module(RplEngine);
 
 RplEngine::RplEngine() {
+    // Nothing to do here
 }
 
 RplEngine::~RplEngine() {
+    delete init_timer;
 }
 
 void RplEngine::initialize(int stage)
 {
-    if(stage == 3){
+    if(stage == 1){
+        isRoot = par("isRoot").boolValue();
+
+        if(isRoot){
+            initialized = true;
+
+            // If root set timer for initialization
+            simtime_t initAbsTime = simTime() + par("initTime").doubleValue();
+
+            // Initialize the timer
+            init_timer = new cMessage();
+            init_timer->setKind(init_timer_kind_self_message);
+            scheduleAt(initAbsTime, init_timer);
+
+            EV << "RPL: Trickle will start at " << initAbsTime << endl;
+        } else {
+            // RPL will be inactive until the first DIO is received
+            initialized = false;
+        }
+
+    } else if(stage == 3){
 
         EV<<"RPL: Recover system pointers\n";
 
@@ -64,6 +88,15 @@ void RplEngine::handleMessage(cMessage *msg)
 
                 // TODO check consistency
 
+                if( !initialized ){
+                    // This is my first DIO message
+                    initialized = true;
+
+                    // Let's wake trickle up!
+                    signalTrickle(rpl_init);
+
+                }
+
                 // Signal trickle that a message has been received
                 signalTrickle(consistant_message_received);
 
@@ -82,9 +115,21 @@ void RplEngine::handleMessage(cMessage *msg)
             }
         }
 
+
         // Free memory
         delete msg;
 
+    } else {
+        // Internal self-messages for timing
+
+        if( msg->getKind() == init_timer_kind_self_message ){
+            // Initialization timer triggered!
+
+            // Time to wake trickle up...
+            signalTrickle(rpl_init);
+
+            // Anything else to be initialized??
+        }
     }
 
 }

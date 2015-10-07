@@ -19,6 +19,12 @@ simple RplEngine{
       
     parameters:
         @display("i=block/control");
+        
+        // True only for root node
+        bool isRoot = default(false);
+        
+        // Initial warm up time
+        double initTime @unit("s") = default(1s); 
                                        
     gates:
         input ipv6In;

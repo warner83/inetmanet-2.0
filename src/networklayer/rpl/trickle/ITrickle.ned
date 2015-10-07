@@ -25,7 +25,6 @@ moduleinterface ITrickle
             double minInt;
 			int redundancy;
 			int maxDoublings;
-			double initTime;
 			
     gates:
         	input engineIn;

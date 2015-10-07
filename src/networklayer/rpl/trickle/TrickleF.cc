@@ -57,6 +57,7 @@ void TrickleF::intervalEnded(){
     scheduleIntervalAt(nextInt);
 
     EV << "Trickle: Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
+    EV << "TrickleF: firing interval " << curInt / (pow(2, suppressedDIOs + 1) ) << ", " <<  curInt / (pow(2, suppressedDIOs)) << endl;
 }
 
 void TrickleF::messageFired() {

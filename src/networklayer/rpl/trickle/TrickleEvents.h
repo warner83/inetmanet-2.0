@@ -16,5 +16,6 @@
 // engine -> trickle
 #define rpl_reset                       2
 #define consistant_message_received     3
+#define rpl_init                        4
 
 #endif /* TRICKLEEVENTS_H_ */

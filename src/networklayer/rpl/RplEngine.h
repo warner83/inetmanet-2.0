@@ -40,6 +40,15 @@ class INET_API RplEngine : public cSimpleModule {
     // My IPv6 address
     IPv6Address myIp;
 
+    // Am I root?
+    bool isRoot;
+
+    // Initialized? set to true when the first DIO is received. Always true if root!
+    bool initialized;
+
+    // Initialization timer, for warm up
+    cMessage* init_timer;
+
     ///////////  RPL functions  ///////////
     void initialize(int stage);
 

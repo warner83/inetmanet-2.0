@@ -20,7 +20,6 @@
 // Self timing messages
 #define trickle_interval_timer_kind_self_message         1
 #define trickle_message_timer_kind_self_message             2
-#define trickle_init_timer_kind_self_message            3
 
 Define_Module(TrickleNormal);
 
@@ -45,15 +44,6 @@ void TrickleNormal::initialize(int stage)
         maxDoublings = par("maxDoublings").doubleValue();
         redundancy = par("redundancy").doubleValue();
 
-        // Set timer for trickle initialization
-        simtime_t initAbsTime = simTime() + par("initTime").doubleValue();
-
-        // Initialize the timer
-        trickle_init_timer = new cMessage();
-        trickle_init_timer->setKind(trickle_init_timer_kind_self_message);
-        scheduleAt(initAbsTime, trickle_init_timer);
-
-        EV << "Trickle: Trickle will start at " << initAbsTime << endl;
     }
 }
 
@@ -82,6 +72,8 @@ void TrickleNormal::handleMessage(cMessage *msg)
             dioReceived();
         } else if(msg->getKind()==rpl_reset){
             reset();
+        } else if(msg->getKind()==rpl_init){
+            initializeTrickle();
         }
 
         // Delete only messages from other modules
@@ -94,8 +86,6 @@ void TrickleNormal::handleMessage(cMessage *msg)
         } else if(msg->getKind()==trickle_message_timer_kind_self_message){
             // Time to send (?)
             messageFired();
-        } else if (msg->getKind()==trickle_init_timer_kind_self_message) {
-            initializeTrickle();
         }
     }
 }
@@ -114,7 +104,7 @@ void TrickleNormal::initializeTrickle(){
     // Let's schedule the end of the interval
     double nextInt = simTime().dbl() + curInt ;
 
-    EV << "Trickle: Initialization at " << simTime() << " completed first interval length " <<  curInt << " next message at " << nextMsg << endl;
+    EV << "Trickle: Initialization at " << simTime() << " first interval length " <<  curInt << " next message at " << nextMsg << endl;
 
     // Set the timer
     scheduleMessageAt(nextMsg);

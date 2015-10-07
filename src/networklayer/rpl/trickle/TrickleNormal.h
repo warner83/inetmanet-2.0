@@ -61,16 +61,16 @@ protected:
     ////////// Internal interfaces //////////
 
     // Self-called when the interval ends
-    void intervalEnded();
+    virtual void intervalEnded();
 
     // Self-called when message timer fires
-    void messageFired();
+    virtual void messageFired();
 
     // Handle self-messages for timing
     void handleMessage(cMessage *msg);
 
     // Initialize timers
-    void initialize(int stage);
+    virtual void initialize(int stage);
 
     virtual int numInitStages()const { return 4;}
 
