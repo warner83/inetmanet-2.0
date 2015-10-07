@@ -24,7 +24,7 @@ module RplRouting
     parameters:
         @display("i=block/control");
 
-        string trickleType = default("TrickleNormal"); // type of the Trickle implementation
+        string trickleType = default("TrickleF"); // type of the Trickle implementation
 
     gates:
         input ipv6In;

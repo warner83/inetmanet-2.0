@@ -23,6 +23,8 @@
 
 class INET_API TrickleNormal: public ITrickle {
 
+protected:
+
     // Initial interval
     double minInt;
 
