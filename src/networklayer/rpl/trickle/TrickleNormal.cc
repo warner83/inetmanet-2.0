@@ -24,7 +24,7 @@
 Define_Module(TrickleNormal);
 
 TrickleNormal::TrickleNormal()  {
-    EV << "Trickle: Node configured with trickle normal! " << endl;
+    EV << "[TRICKLE] Node configured with trickle normal! " << endl;
 }
 
 TrickleNormal::~TrickleNormal() {
@@ -104,7 +104,7 @@ void TrickleNormal::initializeTrickle(){
     // Let's schedule the end of the interval
     double nextInt = simTime().dbl() + curInt ;
 
-    EV << "Trickle: Initialization at " << simTime() << " first interval length " <<  curInt << " next message at " << nextMsg << endl;
+    EV << "[TRICKLE] Initialization at " << simTime() << " first interval length " <<  curInt << " next message at " << nextMsg << endl;
 
     // Set the timer
     scheduleMessageAt(nextMsg);
@@ -114,7 +114,7 @@ void TrickleNormal::initializeTrickle(){
 
 void TrickleNormal::reset(){
 
-    EV << "Trickle: Reset!" << endl;
+    EV << "[TRICKLE] Reset!" << endl;
 
     // Cancel all pending actions
     cancelAllTimers();
@@ -148,17 +148,17 @@ void TrickleNormal::intervalEnded(){
     double nextInt = simTime().dbl() + curInt ;
     scheduleIntervalAt(nextInt);
 
-    EV << "Trickle: Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
+    EV << "[TRICKLE] Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
 }
 
 void TrickleNormal::messageFired() {
     if( numMessagesReceived <= redundancy ){
-        EV << "Trickle: Sending DIO out received messages " << numMessagesReceived << endl;
+        EV << "[TRICKLE] Sending DIO out received messages " << numMessagesReceived << endl;
 
         // Send out a DIO message only if the number of messages received is below the redundancy threshold
         signalEngine(send_dio_message);
     } else {
-        EV << "Trickle: DIO suppressed " << numMessagesReceived << endl;
+        EV << "[TRICKLE] DIO suppressed " << numMessagesReceived << endl;
     }
 }
 

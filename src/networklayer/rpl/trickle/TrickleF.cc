@@ -30,7 +30,7 @@ void TrickleF::initialize(int stage)
 {
     suppressedDIOs = 0 ;
 
-    std::cout << "TrickleF " << redundancy << endl;
+    std::cout << "[TrickleF] " << redundancy << endl;
 
     TrickleNormal::initialize(stage);
 }

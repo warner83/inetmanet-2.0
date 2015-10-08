@@ -46,15 +46,26 @@ class INET_API RplEngine : public cSimpleModule {
     // Initialized? set to true when the first DIO is received. Always true if root!
     bool initialized;
 
+    // Current rank of the node
+    unsigned int rank;
+
+    // Current DODAGID
+    IPv6Address dodagID;
+
     // Initialization timer, for warm up
     cMessage* init_timer;
 
     ///////////  RPL functions  ///////////
+
+    // Omnet functions
     void initialize(int stage);
 
     virtual int numInitStages()const { return 4; }
 
     void handleMessage(cMessage *msg);
+
+    // Initialize engine
+    void engineInitialize();
 
     ///////////  Trickle event signal functions  ///////////
 
