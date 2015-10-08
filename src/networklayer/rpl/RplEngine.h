@@ -52,8 +52,14 @@ class INET_API RplEngine : public cSimpleModule {
     // Current DODAGID
     IPv6Address dodagID;
 
+    // Current DODAG version
+    unsigned int dodagVersion;
+
     // Initialization timer, for warm up
     cMessage* init_timer;
+
+    // Reset timer, for global reset
+    cMessage* reset_timer;
 
     ///////////  RPL functions  ///////////
 

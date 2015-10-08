@@ -24,7 +24,10 @@ simple RplEngine{
         bool isRoot = default(false);
         
         // Initial warm up time
-        double initTime @unit("s") = default(1s); 
+        double initTime @unit("s") = default(1s);
+        
+        // Global reset timer
+        double resetTime @unit("s") = default(10s);  
                                        
     gates:
         input ipv6In;

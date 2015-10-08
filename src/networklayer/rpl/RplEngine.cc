@@ -25,8 +25,9 @@
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
 
-
+// Timer definitions, used only by root nodes
 #define init_timer_kind_self_message        1
+#define reset_timer_kind_self_message        2
 
 Define_Module(RplEngine);
 
@@ -36,6 +37,7 @@ RplEngine::RplEngine() {
 
 RplEngine::~RplEngine() {
     delete init_timer;
+    delete reset_timer;
 }
 
 void RplEngine::initialize(int stage)
@@ -73,14 +75,18 @@ void RplEngine::engineInitialize(){
         // Root set rank as MIN_HOP_RANK_INCREASE
         rank = MIN_HOP_RANK_INCREASE;
 
+        // Set DODAG version to the first valid
+        dodagVersion = 1;
+
         EV << "[RPL] ROOT node creates DODAG " << dodagID << " with rank " << rank << endl;
 
         // If root set timer for initialization
         simtime_t initAbsTime = simTime() + par("initTime").doubleValue();
 
-        // Initialize the timer
+        // Initialize the init timer
         init_timer = new cMessage();
         init_timer->setKind(init_timer_kind_self_message);
+        // Schedule trickle initialization
         scheduleAt(initAbsTime, init_timer);
 
         EV << "[RPL] Trickle will start at " << initAbsTime << endl;
@@ -89,6 +95,12 @@ void RplEngine::engineInitialize(){
 
         // RPL will be inactive until the first DIO is received
         initialized = false;
+
+        // Set my rank to infinite
+        rank = INFINITE_RANK;
+
+        // Set DODAG version to an invalid value
+        dodagVersion = INVALID_DODAG_VERSION;
 
         // For non-root nodes initialize the dodag as unspecified address
         dodagID = IPv6Address::UNSPECIFIED_ADDRESS;
@@ -124,6 +136,7 @@ void RplEngine::handleMessage(cMessage *msg)
 
                         // Let's join this DODAG
                         dodagID = dioMessage->getDODAGID();
+                        dodagVersion = dioMessage->getVersionNumber();
 
                         // Update rank
                         rank = dioMessage->getRank() + MIN_HOP_RANK_INCREASE ; // TODO implement OF here!
@@ -132,6 +145,24 @@ void RplEngine::handleMessage(cMessage *msg)
 
                     } else if ( dioMessage->getDODAGID().compare(dodagID) == 0 ) {
                         // The message belongs to my DODAG
+
+                        // Check the DODAG version number
+                        if( dodagVersion < dioMessage->getVersionNumber() ){
+
+                            // The version has changed! This is a global reset!
+
+                            // Update version
+                            dodagVersion = dioMessage->getVersionNumber();
+
+                            // Reset rank
+                            rank = INFINITE_RANK;
+
+                            // Reset trickle
+                            signalTrickle(rpl_reset);
+
+                            EV << "[RPL] Global reset, new DODAG version " << dodagVersion << endl;
+
+                        }
 
                         // Update rank
                         rank = dioMessage->getRank() + MIN_HOP_RANK_INCREASE ; // TODO implement OF here!
@@ -174,13 +205,34 @@ void RplEngine::handleMessage(cMessage *msg)
     } else {
         // Internal self-messages for timing
 
+        // Root nodes only!
         if( msg->getKind() == init_timer_kind_self_message ){
             // Initialization timer triggered!
 
             // Time to wake trickle up...
             signalTrickle(rpl_init);
 
-            // Anything else to be initialized??
+            // Initialize and set the reset timer
+            reset_timer = new cMessage();
+            reset_timer->setKind(reset_timer_kind_self_message);
+
+            // Set the timer
+            double resetAbsTime = simTime().dbl() + par("resetTime").doubleValue();
+            scheduleAt(resetAbsTime, reset_timer);
+
+            EV << "[RPL] Global reset scheduled at " << resetAbsTime  << endl;
+        } else if( msg->getKind() == reset_timer_kind_self_message ){
+            // Global reset timer triggered
+
+            // Increase DODAG version
+            dodagVersion++;
+
+            // Time to reset trickle...
+            signalTrickle(rpl_reset);
+
+            // Re-set the timer
+            double resetAbsTime = simTime().dbl() + par("resetTime").doubleValue();
+            scheduleAt(resetAbsTime, reset_timer);
         }
     }
 
@@ -205,6 +257,7 @@ void RplEngine::sendDioOut(){
     dioMessage->setCode(DIO);
     dioMessage->setRank(rank);
     dioMessage->setDODAGID(dodagID);
+    dioMessage->setVersionNumber(dodagVersion);
 
     // Set IPV6 header fields
     IPv6Address dest=IPv6Address("FF02::1"); // IPv6 link-local multicast!
