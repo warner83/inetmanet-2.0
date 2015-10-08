@@ -18,8 +18,9 @@
 #ifndef TRICKLENORMAL_H_
 #define TRICKLENORMAL_H_
 
-#include <trickle/ITrickle.h>
+// Class implementing the regular Trickle
 
+#include <trickle/ITrickle.h>
 
 class INET_API TrickleNormal: public ITrickle {
 

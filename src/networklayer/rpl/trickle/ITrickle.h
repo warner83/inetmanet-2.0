@@ -8,10 +8,11 @@
 #ifndef ITRICKLE_H_
 #define ITRICKLE_H_
 
+// This class is the interface for Trickle implementations
+
 #include <omnetpp.h>
 
 #include "INETDefs.h"
-
 
 class INET_API ITrickle: public cSimpleModule {
 

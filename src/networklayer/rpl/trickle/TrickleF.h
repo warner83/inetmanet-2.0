@@ -16,6 +16,8 @@
 #ifndef TRICKLEF_H_
 #define TRICKLEF_H_
 
+// Class implementing Trickle-F
+
 #include <TrickleNormal.h>
 
 class TrickleF: public TrickleNormal {

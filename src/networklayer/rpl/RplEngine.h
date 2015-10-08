@@ -16,6 +16,8 @@
 #ifndef RPL_H_
 #define RPL_H_
 
+// Class implementing the RPL routing engine
+
 #include <omnetpp.h>
 
 #include "INETDefs.h"
