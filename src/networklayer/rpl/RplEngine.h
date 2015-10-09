@@ -26,6 +26,11 @@
 #include "IPv6InterfaceData.h"
 #include "InterfaceTableAccess.h"
 #include "IPv6ControlInfo.h"
+#include "IPv6NeighbourDiscovery.h"
+#include "IPv6NeighbourDiscoveryAccess.h"
+#include "RoutingTable6.h"
+#include "RoutingTable6Access.h"
+#include "MACAddress.h"
 
 #include "OF/OFBase.h"
 
@@ -38,14 +43,22 @@ class INET_API RplEngine : public cSimpleModule {
     ///////////  System pointers  ///////////
     IInterfaceTable *ift; // Pointer to the interface table
     InterfaceEntry* ie; // Pointer to the WPAN interface entry
+    IPv6NeighbourDiscovery* nd; // Pointer to the ND table
+    RoutingTable6* rt6; // Pointer to the Routing Table
 
     ///////////  Internal structures  ///////////
 
     // My IPv6 address
     IPv6Address myIp;
 
+    // My mac address
+    MACAddress myMac;
+
     // Am I root?
     bool isRoot;
+
+    // Enable ND Cache autoregistration
+    bool registerNeigh;
 
     // Initialized? set to true when the first DIO is received. Always true if root!
     bool initialized;
@@ -84,6 +97,9 @@ class INET_API RplEngine : public cSimpleModule {
 
     // Initialize engine
     void engineInitialize();
+
+    // Update Routing Table
+    void updateRoutingTable(IPv6Address preferred);
 
     ///////////  Trickle event signal functions  ///////////
 

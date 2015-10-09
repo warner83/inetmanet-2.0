@@ -407,6 +407,10 @@ class INET_API IPv6NeighbourDiscovery : public cSimpleModule, public ILifecycle
     public:
         void invalidateNeigbourCache();
 
+        // Added to help testing of routing protocol in lossy networks, the routing protocol directly add the entry in the neighbour table
+        void addNeighbour(const IPv6Address& addr, int interfaceID,
+                MACAddress macAddress);
+
     protected:
         void routersUnreachabilityDetection(const InterfaceEntry* ie); // 3.9.07 - CB
         bool isWirelessInterface(const InterfaceEntry *ie);

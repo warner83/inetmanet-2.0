@@ -2692,6 +2692,12 @@ void IPv6NeighbourDiscovery::invalidateNeigbourCache()
     neighbourCache.invalidateAllEntries();
 }
 
+void IPv6NeighbourDiscovery::addNeighbour(const IPv6Address& addr, int interfaceID,
+        MACAddress macAddress){
+    if(neighbourCache.lookup(addr,interfaceID) == NULL)
+        neighbourCache.addRouter(addr, interfaceID, macAddress, 0);
+}
+
 bool IPv6NeighbourDiscovery::canServeWirelessNodes(InterfaceEntry *ie)
 {
     if (isWirelessInterface(ie))

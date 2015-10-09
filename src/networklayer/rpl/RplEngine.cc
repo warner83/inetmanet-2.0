@@ -50,6 +50,7 @@ void RplEngine::initialize(int stage)
 
         // Recover params
         isRoot = par("isRoot").boolValue();
+        registerNeigh = par("registerNeigh").boolValue();
 
         // Instantiate the Objective function
         if(strcmp(par("objectiveFunctionType").stringValue(), "OFzero") == 0){
@@ -68,11 +69,16 @@ void RplEngine::initialize(int stage)
         ift = InterfaceTableAccess().get(); // Interface table
         ie = ift->getInterface(WPAN_INTERFACE); // WPAN interface entry
         myIp = ie->ipv6Data()->getLinkLocalAddress();
+        myMac = ie->getMacAddress();
+        rt6 = RoutingTable6Access().get();
 
         EV <<"[RPL] My IPv6 is " << myIp.str() << endl;
 
         // Initialize RPL engine
         engineInitialize();
+
+        // Initialize nd pointer
+        nd = IPv6NeighbourDiscoveryAccess().get();
 
     }
 }
@@ -201,6 +207,9 @@ void RplEngine::handleMessage(cMessage *msg)
                             // Set the new preferred parent
                             preferredParent = of->getPP();
 
+                            // Update the routing table
+                            updateRoutingTable(preferredParent);
+
                             EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
 
                         } else {
@@ -226,6 +235,13 @@ void RplEngine::handleMessage(cMessage *msg)
                 EV << "[RPL] unknown rpl message from network " << rplMessage->getCode() << endl;
                 abort();
             }
+
+            // This mode let RPL registering directly neighbors in the NeighborCache Table, this disable ND procedure
+            if(registerNeigh){
+                // Register the source of the source node of the RPL packet
+                nd->addNeighbour(rplMessage->getSrc(), 101, rplMessage->getMacSrc());
+            }
+
         } else if( strcmp(msg->getArrivalGate()->getFullName(), "trickleIn" ) == 0 ){
             // Internal message from trickle
             if( msg->getKind() == send_dio_message ){
@@ -276,6 +292,20 @@ void RplEngine::handleMessage(cMessage *msg)
 
 }
 
+void RplEngine::updateRoutingTable(IPv6Address preferred){
+    // Clear routing table
+    rt6->removeAllRoutes();
+
+    // Add a new default route to preferred parent
+    /*IPv6Route *route = new IPv6Route(IPv6Address(), 0,  IPv6Route::ROUTING_PROT );
+    route->setInterfaceId(WPAN_INTERFACE);
+    route->setNextHop(preferred);
+    route->setMetric(10); // TODO check this value*/
+
+    rt6->addDefaultRoute(preferred, WPAN_INTERFACE, 0);
+    //rt6->addRoutingProtocolRoute(route);
+}
+
 void RplEngine::signalTrickle(int kind){
     // Create a new message and send it out to the engine
     cMessage* msg = new cMessage("",kind);
@@ -291,6 +321,8 @@ void RplEngine::sendDioOut(){
 
     // Create the DIO message
     DIOmessage *dioMessage = new DIOmessage();
+    RPLmessage *rplMessage = dioMessage;
+
     dioMessage->setType(ICMPv6_RPL);
     dioMessage->setCode(DIO);
     dioMessage->setRank(rank);
@@ -309,6 +341,10 @@ void RplEngine::sendDioOut(){
 
     // Set pkt len TODO set it automatically
     dioMessage->setByteLength(DIO_LEN);
+
+    // Set meta-information, TODO find a better way
+    rplMessage->setMacSrc(myMac);
+    rplMessage->setSrc(myIp);
 
     // Send the packet out!
     send(PK(dioMessage),"ipv6Out");

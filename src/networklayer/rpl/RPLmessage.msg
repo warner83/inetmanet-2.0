@@ -16,11 +16,14 @@
 cplusplus {{
 #include "IPv6Address.h"
 #include "ICMPv6Message_m.h"
+#include "MACAddress.h"
 }}
 
 class noncobject IPv6Address;
+class noncobject MACAddress;
 
 packet ICMPv6Message;
+
 
 //
 // RPL message definition
@@ -38,6 +41,7 @@ enum RPL_messages_types
 packet RPLmessage extends ICMPv6Message {
     int code enum(RPL_messages_types);  
     
-    // Mgmt information collected at the IPv6 layer and passed to RPL
+    // Mgmt information collected passed to RPL, TODO find a better way to transport this info
 	IPv6Address src;
+	MACAddress macSrc;
 }

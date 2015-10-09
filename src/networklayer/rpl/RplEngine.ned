@@ -31,6 +31,9 @@ simple RplEngine{
         
         // OF selected
         string objectiveFunctionType = default("MRHOF");
+        
+        // Enable auto registration of neighbors in the ND Cache
+        bool registerNeigh = default(true);
                                        
     gates:
         input ipv6In;
