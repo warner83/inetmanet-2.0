@@ -302,7 +302,7 @@ void RplEngine::updateRoutingTable(IPv6Address preferred){
     route->setNextHop(preferred);
     route->setMetric(10); // TODO check this value*/
 
-    rt6->addDefaultRoute(preferred, WPAN_INTERFACE, 0);
+    rt6->addDefaultRoute(preferred, WPAN_INTERFACE, 0); // Check this TODO
     //rt6->addRoutingProtocolRoute(route);
 }
 
