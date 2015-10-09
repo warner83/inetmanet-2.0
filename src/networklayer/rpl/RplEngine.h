@@ -27,6 +27,8 @@
 #include "InterfaceTableAccess.h"
 #include "IPv6ControlInfo.h"
 
+#include "OF/OFBase.h"
+
 #define WPAN_INTERFACE 0
 
 #define DIO_LEN         28 // TODO check this!!
@@ -51,11 +53,19 @@ class INET_API RplEngine : public cSimpleModule {
     // Current rank of the node
     unsigned int rank;
 
+    // Current preferred parent
+    IPv6Address preferredParent;
+
     // Current DODAGID
     IPv6Address dodagID;
 
     // Current DODAG version
     unsigned int dodagVersion;
+
+    // Objective function
+    OFBase* of;
+
+    ///////////  Timers  ///////////
 
     // Initialization timer, for warm up
     cMessage* init_timer;

@@ -21,6 +21,8 @@
 #include "RplDefs.h"
 
 #include "trickle/TrickleEvents.h"
+#include "OF/OFzero.h"
+#include "OF/MRHOF.h"
 
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
@@ -36,8 +38,10 @@ RplEngine::RplEngine() {
 }
 
 RplEngine::~RplEngine() {
-    delete init_timer;
-    delete reset_timer;
+    cancelAndDelete(init_timer);
+    cancelAndDelete(reset_timer);
+
+    delete of;
 }
 
 void RplEngine::initialize(int stage)
@@ -46,6 +50,17 @@ void RplEngine::initialize(int stage)
 
         // Recover params
         isRoot = par("isRoot").boolValue();
+
+        // Instantiate the Objective function
+        if(strcmp(par("objectiveFunctionType").stringValue(), "OFzero") == 0){
+            of = (OFBase*) new OFzero(isRoot);
+        } else if(strcmp(par("objectiveFunctionType").stringValue(), "MRHOF") == 0 ){
+            of = (OFBase*) new MRHOF(isRoot, PREFERRED_PARENT_SIZE); // TODO set preferred parent size as param
+        } else {
+            // OF invalid
+            std::cout << "[RPL] unknown objective function " << par("objectiveFunctionType").str() << endl;
+            abort();
+        }
 
     } else if(stage == 3){
 
@@ -105,6 +120,9 @@ void RplEngine::engineInitialize(){
         // For non-root nodes initialize the dodag as unspecified address
         dodagID = IPv6Address::UNSPECIFIED_ADDRESS;
     }
+
+    // Set an invalid preferred parent
+    preferredParent = IPv6Address::UNSPECIFIED_ADDRESS;
 }
 
 void RplEngine::handleMessage(cMessage *msg)
@@ -124,7 +142,7 @@ void RplEngine::handleMessage(cMessage *msg)
                 EV<<"[RPL] DIO message received from " << rplMessage->getSrc().str() << " DODAGID " << dioMessage->getDODAGID().str() << " rank " << dioMessage->getRank() << endl;
 
                 // Signal trickle that a message has been received
-                signalTrickle(consistant_message_received);
+                signalTrickle(message_received);
 
                 if( !isRoot ){
                     // Root node ignores DIO messages!
@@ -138,13 +156,17 @@ void RplEngine::handleMessage(cMessage *msg)
                         dodagID = dioMessage->getDODAGID();
                         dodagVersion = dioMessage->getVersionNumber();
 
-                        // Update rank
-                        rank = dioMessage->getRank() + MIN_HOP_RANK_INCREASE ; // TODO implement OF here!
+                        // Reset OF data, this will cause an inconsistency
+                        of->reset();
 
-                        EV << "[RPL] Join DODAG " << dioMessage->getDODAGID() << " with rank " << rank << endl;
+                        EV << "[RPL] Join DODAG " << dioMessage->getDODAGID() << endl;
 
-                    } else if ( dioMessage->getDODAGID().compare(dodagID) == 0 ) {
+                    }
+
+                    if ( dioMessage->getDODAGID().compare(dodagID) == 0 ) {
                         // The message belongs to my DODAG
+
+                        EV << "[RPL] My status is DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
 
                         // Check the DODAG version number
                         if( dodagVersion < dioMessage->getVersionNumber() ){
@@ -157,17 +179,33 @@ void RplEngine::handleMessage(cMessage *msg)
                             // Reset rank
                             rank = INFINITE_RANK;
 
-                            // Reset trickle
-                            signalTrickle(rpl_reset);
+                            // Reset OF data, this will cause an inconsistency
+                            of->reset();
 
                             EV << "[RPL] Global reset, new DODAG version " << dodagVersion << endl;
 
                         }
 
-                        // Update rank
-                        rank = dioMessage->getRank() + MIN_HOP_RANK_INCREASE ; // TODO implement OF here!
+                        // Let OF process the DIO message for rank evaluation and parent selection
+                        bool inconsistency = of->process_dio( rplMessage->getSrc(), dioMessage );
 
-                        EV << "[RPL] Update rank " << rank << endl;
+                        if(inconsistency){
+                            // DIO message has triggered some changes (e.g. preferred parent, rank or global reset)
+
+                            // Reset trickle
+                            signalTrickle(rpl_reset);
+
+                            // Update rank
+                            rank = of->getRank();
+
+                            // Set the new preferred parent
+                            preferredParent = of->getPP();
+
+                            EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
+
+                        } else {
+                            EV << "[RPL] Rank " << rank << " confirmed" << endl;
+                        }
 
                     } else {
                         // Do nothing, the message belongs to a different DODAG

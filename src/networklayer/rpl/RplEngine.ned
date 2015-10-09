@@ -28,6 +28,9 @@ simple RplEngine{
         
         // Global reset timer
         double resetTime @unit("s") = default(10s);  
+        
+        // OF selected
+        string objectiveFunctionType = default("MRHOF");
                                        
     gates:
         input ipv6In;

@@ -28,7 +28,8 @@ TrickleNormal::TrickleNormal()  {
 }
 
 TrickleNormal::~TrickleNormal() {
-    // Nothing to do here
+    cancelAndDelete(trickle_interval_timer);
+    cancelAndDelete(trickle_message_timer);
 }
 
 void TrickleNormal::initialize(int stage)
@@ -48,18 +49,16 @@ void TrickleNormal::initialize(int stage)
 }
 
 void TrickleNormal::scheduleMessageAt(double t){
-    //take(trickle_message_timer);
+    cancelEvent(trickle_message_timer);
     scheduleAt(t, trickle_message_timer);
 }
 
 void TrickleNormal::scheduleIntervalAt(double t){
-    //take(trickle_interval_timer);
+    cancelEvent(trickle_interval_timer);
     scheduleAt(t, trickle_interval_timer);
 }
 
 void TrickleNormal::cancelAllTimers(){
-    //take(trickle_message_timer);
-    //take(trickle_interval_timer);
     cancelEvent(trickle_interval_timer);
     cancelEvent(trickle_message_timer);
 }
@@ -68,7 +67,7 @@ void TrickleNormal::handleMessage(cMessage *msg)
 {
     if (!msg->isSelfMessage()){
         // The message is from the rpl engine
-        if(msg->getKind()==consistant_message_received){
+        if(msg->getKind()==message_received){
             dioReceived();
         } else if(msg->getKind()==rpl_reset){
             reset();

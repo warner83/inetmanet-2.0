@@ -31,7 +31,8 @@ OFBase::~OFBase() {
 }
 
 unsigned int OFBase::addrToIndex(IPv6Address a){
-    return a.words()[3];
+    unsigned int n = a.words()[3] & 0xFF;
+    return n ;
 }
 
 void OFBase::printParentSet(){
@@ -49,12 +50,13 @@ void OFBase::printParentSet(){
 }
 
 bool OFBase::process_dio(IPv6Address srcAddr, DIOmessage *dioMessage) {
+    EV << "[OF] Process dio" << endl;
     if(isRoot)
         // Lazy root, ignore other DIOs
         return false;
 
     // Create temporary descriptor
-    struct parent np(dioMessage->getRank(), 1, 0, srcAddr, addrToIndex(srcAddr) ); // TODO get link metric!
+    struct parent np(dioMessage->getRank(), 1, 0, srcAddr, addrToIndex(srcAddr) ); // TODO get link metric! With zero we have a hop-based objective function
 
     // Evaluate final cost
     evaluateCost(&np);

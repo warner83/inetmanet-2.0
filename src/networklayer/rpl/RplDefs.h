@@ -15,6 +15,6 @@
 
 #define INVALID_DODAG_VERSION             0
 
-
+#define PREFERRED_PARENT_SIZE               3
 
 #endif /* RPLDEFS_H_ */
