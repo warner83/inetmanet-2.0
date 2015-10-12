@@ -74,11 +74,21 @@ void RplEngine::initialize(int stage)
 
         EV <<"[RPL] My IPv6 is " << myIp.str() << endl;
 
+        // Initialization...
+
         // Initialize RPL engine
         engineInitialize();
 
         // Initialize nd pointer
         nd = IPv6NeighbourDiscoveryAccess().get();
+
+        // Initialize routing table: set route for my subnet
+        IPv6Address subnet=IPv6Address("aaaa::");
+        IPv6Route *route = new IPv6Route(subnet, 64, IPv6Route::ROUTING_PROT);
+        route->setInterfaceId(ie->getInterfaceId());
+        route->setMetric(0);
+
+        rt6->addRoutingProtocolRoute(route);
 
     }
 }
@@ -239,7 +249,7 @@ void RplEngine::handleMessage(cMessage *msg)
             // This mode let RPL registering directly neighbors in the NeighborCache Table, this disable ND procedure
             if(registerNeigh){
                 // Register the source of the source node of the RPL packet
-                nd->addNeighbour(rplMessage->getSrc(), 101, rplMessage->getMacSrc());
+                nd->addNeighbour(rplMessage->getSrc(), ie->getInterfaceId(), rplMessage->getMacSrc());
             }
 
         } else if( strcmp(msg->getArrivalGate()->getFullName(), "trickleIn" ) == 0 ){
@@ -296,14 +306,8 @@ void RplEngine::updateRoutingTable(IPv6Address preferred){
     // Clear routing table
     rt6->removeAllRoutes();
 
-    // Add a new default route to preferred parent
-    /*IPv6Route *route = new IPv6Route(IPv6Address(), 0,  IPv6Route::ROUTING_PROT );
-    route->setInterfaceId(WPAN_INTERFACE);
-    route->setNextHop(preferred);
-    route->setMetric(10); // TODO check this value*/
-
-    rt6->addDefaultRoute(preferred, WPAN_INTERFACE, 0); // Check this TODO
-    //rt6->addRoutingProtocolRoute(route);
+    // Set a new default route
+    rt6->addDefaultRoute(preferred, ie->getInterfaceId(), 0); // Check this TODO
 }
 
 void RplEngine::signalTrickle(int kind){

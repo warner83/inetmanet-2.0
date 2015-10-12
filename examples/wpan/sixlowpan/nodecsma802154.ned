@@ -77,7 +77,7 @@ module nodecsma802154
         routingTable6: RoutingTable6 {
             parameters:
                 @display("p=53,287");
-                isRouter = false;
+                isRouter = true;
         }
 
         tcpApp[numTcpApps]: <tcpAppType> like ITCPApp {

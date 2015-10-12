@@ -30,7 +30,7 @@ simple RplEngine{
         double resetTime @unit("s") = default(10s);  
         
         // OF selected
-        string objectiveFunctionType = default("MRHOF");
+        string objectiveFunctionType = default("OFzero");
         
         // Enable auto registration of neighbors in the ND Cache
         bool registerNeigh = default(true);

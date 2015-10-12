@@ -20,7 +20,7 @@ package inet.examples.wpan.rpl;
 
 import inet.networklayer.autorouting.ipv6.FlatNetworkConfigurator6;
 import inet.world.radio.ChannelControl;
-import inet.examples.wpan.sixlowpan.nodecsma802154;
+import inet.examples.wpan.rpl.nodecsma802154;
 
 
 network csma802154net
