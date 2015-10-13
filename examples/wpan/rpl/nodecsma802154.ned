@@ -78,6 +78,7 @@ module nodecsma802154
             parameters:
                 @display("p=53,287");
                 isRouter = true;
+                sendAdv = false; // Don't send TA -> too much traffic to handle
         }
 
         tcpApp[numTcpApps]: <tcpAppType> like ITCPApp {
@@ -138,6 +139,11 @@ module nodecsma802154
                 @display("p=65,230;i=block/plug");
 
         }
+         
+        lo0: LoopbackInterface {
+            @display("p=78,406");
+        }
+        
     connections allowunconnected:
 
         for i=0..numTcpApps-1 {
@@ -153,8 +159,8 @@ module nodecsma802154
             udpApp[i].udpIn <-- udp.appOut++;
         }
 
-        udp.ipOut --> networkLayer.transportIn++;
-        udp.ipIn <-- networkLayer.transportOut++;
+        udp.ipv6Out --> networkLayer.transportIn++;
+        udp.ipv6In <-- networkLayer.transportOut++;
 
         for i=0..numPingApps-1 {
             networkLayer.pingOut++ --> pingApp[i].pingv6In;
@@ -167,6 +173,11 @@ module nodecsma802154
         radioIn --> wlan.radioIn;
         wlan.upperLayerOut --> networkLayer.ifIn++;
         wlan.upperLayerIn <-- networkLayer.ifOut++;
+
+        // connections for loopback interface
+        networkLayer.ifOut++ --> lo0.upperLayerIn;
+        lo0.upperLayerOut --> networkLayer.ifIn++;
+
 
 }
 

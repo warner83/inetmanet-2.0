@@ -113,6 +113,7 @@ void RoutingTable6::initialize(int stage)
         WATCH_PTRVECTOR(routeList);
         WATCH_MAP(destCache); // FIXME commented out for now
         isrouter = par("isRouter");
+        sendAdv = par("sendAdv");
         multicastForward = par("forwardMulticast");
         WATCH(isrouter);
 
@@ -282,7 +283,7 @@ void RoutingTable6::configureInterfaceForIPv6(InterfaceEntry *ie)
     //FIXME: we will use this isRouter flag for now. what if future implementations
     //have 2 interfaces where one interface is configured as a router and the other
     //as a host?
-    ipv6IfData->setAdvSendAdvertisements(isrouter); //Added by WEI
+    ipv6IfData->setAdvSendAdvertisements(sendAdv); //Added by WEI // Mod by CV created an ad-hoc param to enable RAs
 
     // metric: some hints: OSPF cost (2e9/bps value), MS KB article Q299540, ...
     //d->setMetric((int)ceil(2e9/ie->getDatarate())); // use OSPF cost as default

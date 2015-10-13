@@ -151,6 +151,7 @@ class INET_API RoutingTable6 : public cSimpleModule, protected INotifiable, publ
     NotificationBoard *nb; // cached pointer
 
     bool isrouter;
+    bool sendAdv;
     bool multicastForward;  //If node is forwarding multicast info
 
 #ifdef WITH_xMIPv6

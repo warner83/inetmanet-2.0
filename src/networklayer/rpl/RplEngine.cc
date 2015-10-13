@@ -250,6 +250,8 @@ void RplEngine::handleMessage(cMessage *msg)
             if(registerNeigh){
                 // Register the source of the source node of the RPL packet
                 nd->addNeighbour(rplMessage->getSrc(), ie->getInterfaceId(), rplMessage->getMacSrc());
+
+                EV << "[RPL] Neighbor registered " << rplMessage->getSrc() << " mac " << rplMessage->getMacSrc() << endl;
             }
 
         } else if( strcmp(msg->getArrivalGate()->getFullName(), "trickleIn" ) == 0 ){

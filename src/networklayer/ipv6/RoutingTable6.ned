@@ -31,6 +31,7 @@ simple RoutingTable6
     parameters:
         xml routingTable = default(xml("<routingTable/>"));
         bool isRouter;
+        bool sendAdv = default(true);
         bool forwardMulticast = default(false);
         @display("i=block/table");
 }
