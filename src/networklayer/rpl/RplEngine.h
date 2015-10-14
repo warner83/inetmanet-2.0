@@ -36,11 +36,15 @@
 
 #include "LinkEstimator/LinkEstimatorBase.h"
 
+#include "Statistics/NodeEventCollector.h"
+
 #define WPAN_INTERFACE 0 // Entry of the WPAN interface (in this case it's zero since we assume that the node is equipped with only one interface)
 
 #define DIO_LEN         28 // TODO check this!!
 
 class INET_API RplEngine : public cSimpleModule {
+
+    friend class GlobalEventCollector;
 
     ///////////  System pointers  ///////////
     IInterfaceTable *ift; // Pointer to the interface table
@@ -82,6 +86,9 @@ class INET_API RplEngine : public cSimpleModule {
 
     // Link estimator
     LinkEstimatorBase* le;
+
+    // Event Collector
+    NodeEventCollector* ec;
 
     ///////////  Timers  ///////////
 

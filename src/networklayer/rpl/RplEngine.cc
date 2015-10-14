@@ -19,6 +19,7 @@
 #include "DIOmessage_m.h"
 
 #include "RplDefs.h"
+#include "RplUtils.h"
 
 #include "trickle/TrickleEvents.h"
 #include "OF/OFzero.h"
@@ -56,6 +57,9 @@ void RplEngine::initialize(int stage)
         isRoot = par("isRoot").boolValue();
         registerNeigh = par("registerNeigh").boolValue();
 
+        // Get pointer to Event Collector
+        ec = check_and_cast<NodeEventCollector*> (this->getParentModule()->getSubmodule("stats"));
+
         // Instantiate the Link Estimator module
         if(strcmp(par("linkEstimatorType").stringValue(), "HopCount") == 0){
             le = (LinkEstimatorBase*) new HopCountEstimator();
@@ -69,9 +73,9 @@ void RplEngine::initialize(int stage)
 
         // Instantiate the Objective function
         if(strcmp(par("objectiveFunctionType").stringValue(), "OFzero") == 0){
-            of = (OFBase*) new OFzero(isRoot,le);
+            of = (OFBase*) new OFzero(isRoot,le, ec);
         } else if(strcmp(par("objectiveFunctionType").stringValue(), "MRHOF") == 0 ){
-            of = (OFBase*) new MRHOF(isRoot, le, PREFERRED_PARENT_SIZE); // TODO set preferred parent size as param
+            of = (OFBase*) new MRHOF(isRoot, le, ec, PREFERRED_PARENT_SIZE); // TODO set preferred parent size as param
         } else {
             // OF invalid
             std::cout << "[RPL] unknown objective function " << par("objectiveFunctionType").str() << endl;
@@ -236,6 +240,9 @@ void RplEngine::handleMessage(cMessage *msg)
                             updateRoutingTable(preferredParent);
 
                             EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
+
+                            // Signal event
+                            //ec->rankChanged(NODE_INDEX, rank);
 
                         } else {
                             EV << "[RPL] Rank " << rank << " confirmed" << endl;

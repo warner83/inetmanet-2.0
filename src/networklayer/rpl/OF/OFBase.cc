@@ -15,11 +15,15 @@
 
 #include <OFBase.h>
 
-OFBase::OFBase(bool root, LinkEstimatorBase* l) {
+#include "RplUtils.h"
+
+OFBase::OFBase(bool root, LinkEstimatorBase* l, EventCollector* e) {
     parent_size = 0;
     isRoot = root;
 
     le =l;
+
+    ec = e;
 
     if(!isRoot)
         myrank = INFINITE_RANK;
@@ -31,11 +35,6 @@ OFBase::OFBase(bool root, LinkEstimatorBase* l) {
 
 OFBase::~OFBase() {
     // TODO Auto-generated destructor stub
-}
-
-unsigned int OFBase::addrToIndex(IPv6Address a){
-    unsigned int n = a.words()[3] & 0xFF;
-    return n ;
 }
 
 void OFBase::printParentSet(){

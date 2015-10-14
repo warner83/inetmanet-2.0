@@ -7,7 +7,7 @@
 
 #include <MRHOF.h>
 
-MRHOF::MRHOF(bool isRoot, LinkEstimatorBase* l, int pp_size) : OFBase(isRoot, l){
+MRHOF::MRHOF(bool isRoot, LinkEstimatorBase* l , EventCollector* e, int pp_size) : OFBase(isRoot, l, e){
     max_parent_size = pp_size;
     parent_set.resize(pp_size);
     preferred_parent = NULL;

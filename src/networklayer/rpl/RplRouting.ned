@@ -18,6 +18,7 @@ package inet.networklayer.rpl;
 import inet.networklayer.rpl.trickle.ITrickle;
 import inet.networklayer.rpl.trickle.TrickleNormal;
 import inet.networklayer.rpl.RplEngine;
+import inet.networklayer.rpl.Statistics.NodeEventCollector;
 
 module RplRouting
 {
@@ -39,6 +40,12 @@ module RplRouting
         rplEngine: RplEngine {
             parameters:
                 @display("p=141,43");
+        }
+        
+        stats: NodeEventCollector{
+            parameters:
+                @display("p=141,43");
+            
         }
 
     connections:

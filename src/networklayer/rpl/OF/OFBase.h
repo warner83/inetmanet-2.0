@@ -27,6 +27,7 @@
 #include "RplDefs.h"
 
 #include "LinkEstimator/LinkEstimatorBase.h"
+#include "Statistics/EventCollector.h"
 
 // This class defines the interface for all the objective functions
 
@@ -69,10 +70,9 @@ protected:
 
     LinkEstimatorBase* le; // Link estimator instance pointer. The instance is created by RPLengine
 
-    // Functions for managing the parent set
+    EventCollector* ec; // Event collector
 
-    // Utility function to convert the IPv6 address to an index. The less significant 32 bits are taken to create the index
-    unsigned int addrToIndex(IPv6Address a);
+    // Functions for managing the parent set
 
     // Return the internal index of parents, return -1 if no parents are found
     int getParent(IPv6Address addr){
@@ -111,7 +111,7 @@ protected:
 
 public:
 
-    OFBase( bool root, LinkEstimatorBase* l );
+    OFBase( bool root, LinkEstimatorBase* l, EventCollector* e );
 
     virtual ~OFBase();
 

@@ -21,6 +21,7 @@ package inet.examples.wpan.rpl;
 import inet.networklayer.autorouting.ipv6.FlatNetworkConfigurator6;
 import inet.world.radio.ChannelControl;
 import inet.examples.wpan.rpl.nodecsma802154;
+import inet.networklayer.rpl.Statistics.GlobalEventCollector;
 
 
 network csma802154net
@@ -42,6 +43,10 @@ network csma802154net
         configurator: FlatNetworkConfigurator6 {
             //config=xml("<config><interface hosts='*' address='145.236.x.x' netmask='255.255.0.0'/></config>");
             @display("p=140,50");
+        }
+        
+        globalStats: GlobalEventCollector {
+        
         }
     connections allowunconnected:
 }
