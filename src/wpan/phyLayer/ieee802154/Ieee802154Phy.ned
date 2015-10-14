@@ -5,7 +5,7 @@ simple Ieee802154Phy
 
         bool debug;
         double channelNumber = default(0);
-        bool NoBitError =default(true);
+        bool NoBitError =default(false);
 
         // power used for transmission of messages (mW)
         double transmitterPower @unit("mW") = default(1.0mW);

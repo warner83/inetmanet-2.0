@@ -10,7 +10,21 @@
 
 #include <LinkEstimatorBase.h>
 
+#include "Coord.h"
+
 class PerfectEtxEstimator: public LinkEstimatorBase {
+
+    // Topology structure
+    cTopology topo;
+
+    // Utility functions
+
+    // Return topology index for the node
+    unsigned int addrToIndex(IPv6Address a);
+
+    // Retrieve node coordinates
+    Coord getCoord(int index);
+
 public:
     PerfectEtxEstimator();
     virtual ~PerfectEtxEstimator();

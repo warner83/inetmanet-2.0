@@ -743,10 +743,10 @@ double Ieee802154Phy::getEtx(Coord senderPos, Coord receiverPos, int bytes){
     if (obstacles && distance > MIN_DISTANCE)
         rcvdPower = obstacles->calculateReceivedPower(rcvdPower, carrierFrequency, senderPos, 0, receiverPos, 0);
 
-    EV << "received power " << rcvdPower << " ";
+    EV << "received power " << rcvdPower << " noise " << BASE_NOISE_LEVEL << " ";
 
     // Get SINR
-    double sinr = rcvdPower / BASE_NOISE_LEVEL; // Concurrent transmissions are not considered here (offline estimation)
+    double sinr = rcvdPower / thermalNoise; // Concurrent transmissions are not considered here (offline estimation)
 
     EV << "sinr " << sinr << " ";
 
@@ -756,10 +756,13 @@ double Ieee802154Phy::getEtx(Coord senderPos, Coord receiverPos, int bytes){
     // Get PER
     double per = rm->estimatePer(sinr, bytes * 8, rs.getBitrate());
 
-    EV << "per " << per << " etx " << 1/per << endl;
+    // Get ETX
+    double etx = 1/(1-per);
+
+    EV << "per " << per << " etx " << etx << endl;
 
     // return ETX
-    return 1/per;
+    return etx;
 
 }
 
