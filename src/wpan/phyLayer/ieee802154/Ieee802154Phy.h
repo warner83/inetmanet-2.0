@@ -35,6 +35,9 @@ class INET_API Ieee802154Phy : public ChannelAccess, public ILifecycle
         Ieee802154Phy();
         virtual ~Ieee802154Phy();
 
+        // ETX estimation
+        double getEtx(Coord senderPos, Coord receiverPos, int bytes);
+
     protected:
         static simsignal_t changeLevelNoise80215;
         virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj);

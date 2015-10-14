@@ -160,7 +160,7 @@ class MRHOF: public OFBase {
 
 
 public:
-    MRHOF(bool isRoot, int pp_size);
+    MRHOF(bool isRoot, LinkEstimatorBase* l, int pp_size);
     virtual ~MRHOF();
 };
 

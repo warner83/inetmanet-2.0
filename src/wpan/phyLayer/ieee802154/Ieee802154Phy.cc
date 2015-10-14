@@ -4,6 +4,7 @@
 #include "Radio80211aControlInfo_m.h"
 #include "NodeStatus.h"
 #include "NodeOperations.h"
+#include "Ieee802154RadioModel.h"
 
 #define MIN_DISTANCE 0.001 // minimum distance 1 millimeter
 // #undef EV
@@ -726,6 +727,40 @@ void Ieee802154Phy::handleLowerMsgEnd(AirFrame * airframe)
             }
         }
     }
+}
+
+double Ieee802154Phy::getEtx(Coord senderPos, Coord receiverPos, int bytes){
+
+    // Get distance from position
+    double distance = senderPos.distance(receiverPos);
+
+    EV << "Evaluating  ETX link from " << senderPos << " to " << receiverPos << " ";
+
+    // Get received power
+    double rcvdPower = receptionModel->calculateReceivedPower(transmitterPower, carrierFrequency, distance);
+
+    // Compute received power considering obstacles
+    if (obstacles && distance > MIN_DISTANCE)
+        rcvdPower = obstacles->calculateReceivedPower(rcvdPower, carrierFrequency, senderPos, 0, receiverPos, 0);
+
+    EV << "received power " << rcvdPower << " ";
+
+    // Get SINR
+    double sinr = rcvdPower / BASE_NOISE_LEVEL; // Concurrent transmissions are not considered here (offline estimation)
+
+    EV << "sinr " << sinr << " ";
+
+    // Cast radio model, this works only with WPAN configuration! FIXME
+    Ieee802154RadioModel* rm = check_and_cast<Ieee802154RadioModel*> (radioModel);
+
+    // Get PER
+    double per = rm->estimatePer(sinr, bytes * 8, rs.getBitrate());
+
+    EV << "per " << per << " etx " << 1/per << endl;
+
+    // return ETX
+    return 1/per;
+
 }
 
 void Ieee802154Phy::handleSelfMsg(cMessage *msg)

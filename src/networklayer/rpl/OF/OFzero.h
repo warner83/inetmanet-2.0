@@ -42,7 +42,7 @@ class OFzero: public OFBase {
 
 
 public:
-    OFzero(bool isRoot);
+    OFzero(bool isRoot, LinkEstimatorBase* l);
     virtual ~OFzero();
 };
 

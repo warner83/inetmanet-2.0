@@ -26,6 +26,8 @@
 
 #include "RplDefs.h"
 
+#include "LinkEstimator/LinkEstimatorBase.h"
+
 // This class defines the interface for all the objective functions
 
 // Parent set management structure
@@ -64,6 +66,8 @@ protected:
 
     double historic_min_rank;
     bool isRoot;
+
+    LinkEstimatorBase* le; // Link estimator instance pointer. The instance is created by RPLengine
 
     // Functions for managing the parent set
 
@@ -107,7 +111,7 @@ protected:
 
 public:
 
-    OFBase( bool root );
+    OFBase( bool root, LinkEstimatorBase* l );
 
     virtual ~OFBase();
 

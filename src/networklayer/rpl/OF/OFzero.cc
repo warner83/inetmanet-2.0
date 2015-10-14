@@ -7,7 +7,7 @@
 
 #include <OFzero.h>
 
-OFzero::OFzero(bool isRoot) : OFBase(isRoot){
+OFzero::OFzero(bool isRoot, LinkEstimatorBase* l) : OFBase(isRoot,l){
     max_parent_size = 1; // Only one parent for OF0
     parent_set.resize(1);
     preferred_parent = NULL;

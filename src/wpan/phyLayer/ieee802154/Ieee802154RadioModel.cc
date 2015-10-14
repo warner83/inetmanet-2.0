@@ -80,6 +80,17 @@ bool Ieee802154RadioModel::packetOk(double snirMin, int lengthMPDU, double bitra
         return true; // no error
 }
 
+double Ieee802154RadioModel::estimatePer(double snirMin, int lengthMPDU, double bitrate){
+    double errorHeader;
+
+    double  ber = std::max(0.5 * exp(-snirMin /2), BER_LOWER_BOUND);
+    errorHeader = 1.0 - pow((1.0 - ber), def_phyHeaderLength*8);
+
+    double MpduError = 1.0 - pow((1.0 - ber), lengthMPDU);
+
+    return MpduError;
+}
+
 
 
 double Ieee802154RadioModel::dB2fraction(double dB)

@@ -32,6 +32,9 @@ simple RplEngine{
         // OF selected
         string objectiveFunctionType = default("OFzero");
         
+        // Link estimator selected
+        string linkEstimatorType = default("HopCount");
+        
         // Enable auto registration of neighbors in the ND Cache
         bool registerNeigh = default(true);
                                        

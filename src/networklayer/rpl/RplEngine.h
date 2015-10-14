@@ -34,6 +34,8 @@
 
 #include "OF/OFBase.h"
 
+#include "LinkEstimator/LinkEstimatorBase.h"
+
 #define WPAN_INTERFACE 0 // Entry of the WPAN interface (in this case it's zero since we assume that the node is equipped with only one interface)
 
 #define DIO_LEN         28 // TODO check this!!
@@ -77,6 +79,9 @@ class INET_API RplEngine : public cSimpleModule {
 
     // Objective function
     OFBase* of;
+
+    // Link estimator
+    LinkEstimatorBase* le;
 
     ///////////  Timers  ///////////
 

@@ -27,6 +27,9 @@
 #include "ICMPv6Message_m.h"
 #include "IPv6Datagram.h"
 
+#include "LinkEstimator/PerfectEtxEstimator.h"
+#include "LinkEstimator/HopCountEstimator.h"
+
 // Timer definitions, used only by root nodes
 #define init_timer_kind_self_message        1
 #define reset_timer_kind_self_message        2
@@ -42,6 +45,7 @@ RplEngine::~RplEngine() {
     cancelAndDelete(reset_timer);
 
     delete of;
+    delete le;
 }
 
 void RplEngine::initialize(int stage)
@@ -52,11 +56,22 @@ void RplEngine::initialize(int stage)
         isRoot = par("isRoot").boolValue();
         registerNeigh = par("registerNeigh").boolValue();
 
+        // Instantiate the Link Estimator module
+        if(strcmp(par("linkEstimatorType").stringValue(), "HopCount") == 0){
+            le = (LinkEstimatorBase*) new HopCountEstimator();
+        } else if(strcmp(par("linkEstimatorType").stringValue(), "PerfectEtx") == 0 ){
+            le = (LinkEstimatorBase*) new PerfectEtxEstimator();
+        } else {
+            // OF invalid
+            std::cout << "[RPL] unknown link estimator " << par("linkEstimatorType").str() << endl;
+            abort();
+        }
+
         // Instantiate the Objective function
         if(strcmp(par("objectiveFunctionType").stringValue(), "OFzero") == 0){
-            of = (OFBase*) new OFzero(isRoot);
+            of = (OFBase*) new OFzero(isRoot,le);
         } else if(strcmp(par("objectiveFunctionType").stringValue(), "MRHOF") == 0 ){
-            of = (OFBase*) new MRHOF(isRoot, PREFERRED_PARENT_SIZE); // TODO set preferred parent size as param
+            of = (OFBase*) new MRHOF(isRoot, le, PREFERRED_PARENT_SIZE); // TODO set preferred parent size as param
         } else {
             // OF invalid
             std::cout << "[RPL] unknown objective function " << par("objectiveFunctionType").str() << endl;

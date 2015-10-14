@@ -15,9 +15,12 @@
 
 #include <OFBase.h>
 
-OFBase::OFBase(bool root) {
+OFBase::OFBase(bool root, LinkEstimatorBase* l) {
     parent_size = 0;
     isRoot = root;
+
+    le =l;
+
     if(!isRoot)
         myrank = INFINITE_RANK;
     else
@@ -56,7 +59,7 @@ bool OFBase::process_dio(IPv6Address srcAddr, DIOmessage *dioMessage) {
         return false;
 
     // Create temporary descriptor
-    struct parent np(dioMessage->getRank(), 1, 0, srcAddr, addrToIndex(srcAddr) ); // TODO get link metric! With zero we have a hop-based objective function
+    struct parent np(dioMessage->getRank(), le->getLinkCost(srcAddr), 0, srcAddr, addrToIndex(srcAddr) );
 
     // Evaluate final cost
     evaluateCost(&np);

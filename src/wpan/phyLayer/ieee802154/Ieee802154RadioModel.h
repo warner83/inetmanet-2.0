@@ -20,6 +20,11 @@ class INET_API Ieee802154RadioModel : public IRadioModel
     virtual double calculateDurationTestFrame(AirFrame *airframe) {return 0;}
     virtual double getTestFrameError(double snirMin, double bitrate) {return 0;}
     virtual int    getTestFrameSize() {return 0;}
+
+    // ETX estimation, this function estimates the Packet Error Rate from SND, frame length and bitrate
+    double estimatePer(double snirMin, int lengthMPDU, double bitrate);
+
+
   protected:
     // utility
     virtual bool packetOk(double snirMin, int lengthMPDU, double bitrate);

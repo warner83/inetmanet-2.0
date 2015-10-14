@@ -139,11 +139,11 @@ module nodecsma802154
                 @display("p=65,230;i=block/plug");
 
         }
-         
+
         lo0: LoopbackInterface {
-            @display("p=78,406");
+            @display("p=404,368");
         }
-        
+
     connections allowunconnected:
 
         for i=0..numTcpApps-1 {
