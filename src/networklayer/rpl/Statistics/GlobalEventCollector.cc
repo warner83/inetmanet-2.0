@@ -16,6 +16,8 @@ Define_Module(GlobalEventCollector);
 
 GlobalEventCollector::GlobalEventCollector() {
     topo.extractByProperty("node");
+
+    numJoinedNodes = 0;
 }
 
 GlobalEventCollector::~GlobalEventCollector() {
@@ -192,4 +194,11 @@ void GlobalEventCollector::finish(){
     EV << "[STAT] avgRank " << avgRank/numNodes << endl;
 
     emit(avgRankSignal, avgRank/numNodes);
+}
+
+void GlobalEventCollector::nodeJoined(int id){
+    numJoinedNodes++;
+    if(numJoinedNodes == numNodes){
+        // All nodes in the network has joined the DODAG, let count some stats
+    }
 }

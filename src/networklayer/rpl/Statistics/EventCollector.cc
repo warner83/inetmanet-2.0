@@ -15,8 +15,7 @@
 Register_Abstract_Class(EventCollector);
 
 EventCollector::EventCollector() {
-    // TODO Auto-generated constructor stub
-
+    id = 0;
 }
 
 EventCollector::~EventCollector() {
@@ -34,6 +33,11 @@ void EventCollector::initialize(int stage){
 
     }
 }
+
+void EventCollector::setID(int i){
+    id = i;
+}
+
 
 void EventCollector::traceValue(std::string metric, int id, double value, int id2){
     if(!timeline)

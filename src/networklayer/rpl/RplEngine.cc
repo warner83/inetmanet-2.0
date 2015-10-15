@@ -109,6 +109,9 @@ void RplEngine::initialize(int stage)
 
         rt6->addRoutingProtocolRoute(route);
 
+        // Assign my ID to the event collector
+        ec->setID(NODE_INDEX);
+
     }
 }
 
@@ -179,6 +182,9 @@ void RplEngine::handleMessage(cMessage *msg)
                 // Signal trickle that a message has been received
                 signalTrickle(message_received);
 
+                // Signal event to EC
+                ec->dioReceived(dioMessage);
+
                 if( !isRoot ){
                     // Root node ignores DIO messages!
 
@@ -230,19 +236,28 @@ void RplEngine::handleMessage(cMessage *msg)
                             // Reset trickle
                             signalTrickle(rpl_reset);
 
-                            // Update rank
-                            rank = of->getRank();
+                            // Updated rank ?
+                            if(rank != of->getRank()){
+                                // Update rank
+                                rank = of->getRank();
 
-                            // Set the new preferred parent
-                            preferredParent = of->getPP();
+                                // Signal event to EC
+                                ec->rankChanged(rank, of->getCost());
+                            }
 
-                            // Update the routing table
-                            updateRoutingTable(preferredParent);
+                            // Change PP ?
+                            if( preferredParent.compare(of->getPP()) != 0 ){
+                                // Set the new preferred parent
+                                preferredParent = of->getPP();
+
+                                // Update the routing table
+                                updateRoutingTable(preferredParent);
+
+                                // Signal event to EC
+                                ec->preferredParentChanged(addrToIndex(preferredParent));
+                            }
 
                             EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
-
-                            // Signal event
-                            //ec->rankChanged(NODE_INDEX, rank);
 
                         } else {
                             EV << "[RPL] Rank " << rank << " confirmed" << endl;
@@ -318,6 +333,9 @@ void RplEngine::handleMessage(cMessage *msg)
             // Time to reset trickle...
             signalTrickle(rpl_reset);
 
+            // Signal event to EC
+            ec->globalReset();
+
             // Re-set the timer
             double resetAbsTime = simTime().dbl() + par("resetTime").doubleValue();
             scheduleAt(resetAbsTime, reset_timer);
@@ -373,6 +391,9 @@ void RplEngine::sendDioOut(){
     // Set meta-information, TODO find a better way
     rplMessage->setMacSrc(myMac);
     rplMessage->setSrc(myIp);
+
+    // Signal event to EC
+    ec->dioSent(dioMessage);
 
     // Send the packet out!
     send(PK(dioMessage),"ipv6Out");

@@ -9,12 +9,18 @@
 #define NODEEVENTCOLLECTIONS_H_
 
 #include "EventCollector.h"
+#include "Coord.h"
 
 // Class for NODE event collector
+
+class DIOmessage;
+class GlobalEventCollector;
 
 class INET_API NodeEventCollector : public EventCollector {
 
     friend class GlobalEventCollector;
+
+    GlobalEventCollector* gc;
 
     //////////// Signals /////////////
 
@@ -27,6 +33,11 @@ class INET_API NodeEventCollector : public EventCollector {
     double shortestCost;
     int minHops;
 
+    bool joined;
+
+    unsigned int numRecvDios;
+    unsigned int numSentDios;
+
 public:
     NodeEventCollector();
     virtual ~NodeEventCollector();
@@ -36,8 +47,20 @@ public:
 
     //////////// Events to be collected /////////////
 
+    // DIOmessage sent
+    void dioSent(DIOmessage* msg);
+
+    // DIOmessage received
+    void dioReceived(DIOmessage* msg);
+
     // Rank changed
-    void rankChanged(int id, int newRank);
+    void rankChanged(int newRank, double cost);
+
+    // PP changed
+    void preferredParentChanged(int index);
+
+    // Global reset
+    void globalReset();
 
 };
 

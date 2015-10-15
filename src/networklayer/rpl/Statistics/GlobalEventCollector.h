@@ -38,6 +38,7 @@ class GlobalEventCollector: public EventCollector {
     //////////// Stats Data Structures /////////////
 
     int numNodes;
+    int numJoinedNodes;
     int rootNode;
 
     std::vector<std::vector<double> > etx; // Etx for each link, -1 if the link is not formed
@@ -55,6 +56,9 @@ public:
     virtual int numInitStages()const { return 4; }
 
     void finish();
+
+    // Each EC uses this function to signal that a node has joined the DODAG
+    void nodeJoined(int id);
 };
 
 #endif /* GLOBALEVENTCOLLECTOR_H_ */

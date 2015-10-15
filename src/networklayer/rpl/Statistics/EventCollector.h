@@ -16,7 +16,7 @@
 
 class INET_API EventCollector : public cSimpleModule  {
 
-private:
+protected:
 
     //////////// Utility data       /////////////
 
@@ -25,6 +25,7 @@ private:
     bool timeline; // True if stat timeline is active
     bool periodic; // True if stat periodic collection is active
     double period; // Period for periodic stat collection
+    int id; // Module ID
 
     //////////// Utility functions /////////////
 
@@ -42,6 +43,9 @@ public:
     virtual ~EventCollector();
 
     void initialize(int stage);
+
+    // Set ID for stats storage
+    void setID(int i);
 
 };
 

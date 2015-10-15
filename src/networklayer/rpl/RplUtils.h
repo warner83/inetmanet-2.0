@@ -14,6 +14,6 @@ static unsigned int addrToIndex(IPv6Address a){
     return n - 1 ;
 }
 
-#define NODE_INDEX addrToIndex(myIp) - 1
+#define NODE_INDEX addrToIndex(myIp)
 
 #endif /* RPLUTILS_H_ */

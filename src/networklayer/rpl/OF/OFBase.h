@@ -127,6 +127,11 @@ public:
         return preferred_parent->addr;
     }
 
+    // Return cost to root in etx
+    double getCost(){
+        return preferred_parent->cost;
+    }
+
     // Return the rank to update RPL structures
     double getRank(){
         return myrank;
