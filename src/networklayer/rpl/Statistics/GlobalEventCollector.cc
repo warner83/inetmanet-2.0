@@ -24,17 +24,21 @@ void GlobalEventCollector::initialize(int stage){
     if(stage == 3 ){
         // Register signals
         avgRankSignal = registerSignal("avgRank");
+        numNodesSignal = registerSignal("numNodes");
 
-        // Get pointers to module
+        // Get num nodes
+        numNodes = topo.getNumNodes();
 
-        rplEngines.resize(topo.getNumNodes());
-        nodeCollectors.resize(topo.getNumNodes());
+        // Get pointers to modules
 
-        for(int i = 0; i < topo.getNumNodes(); ++i){
+        rplEngines.resize(numNodes);
+        nodeCollectors.resize(numNodes);
+
+        for(int i = 0; i < numNodes; ++i){
 
             cModule *mod = topo.getNode(i)->getModule();
 
-            RplEngine* rpl = check_and_cast<RplEngine *> (mod->getSubmodule("networkLayer")->getSubmodule("rpl"));
+            RplEngine* rpl = check_and_cast<RplEngine *> (mod->getSubmodule("networkLayer")->getSubmodule("rpl")->getSubmodule("rplEngine"));
             rplEngines[i] = rpl;
             nodeCollectors[i] = rpl->ec;
 
@@ -45,13 +49,18 @@ void GlobalEventCollector::initialize(int stage){
 }
 
 void GlobalEventCollector::finish(){
+
+    // Num nodes
+    emit(numNodesSignal, numNodes);
+
+    // Average rank
     double avgRank = 0;
 
-    for(int i = 0; i < topo.getNumNodes(); ++i){
+    for(int i = 0; i < numNodes; ++i){
         avgRank += rplEngines[i]->rank;
     }
 
-    EV << "[STAT] avgRank " << avgRank << endl;
+    EV << "[STAT] avgRank " << avgRank/numNodes << endl;
 
-    emit(avgRankSignal, avgRank);
+    emit(avgRankSignal, avgRank/numNodes);
 }

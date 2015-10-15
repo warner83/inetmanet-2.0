@@ -19,7 +19,8 @@ class GlobalEventCollector: public EventCollector {
 
     //////////// Signals /////////////
 
-    simsignal_t avgRankSignal;
+    simsignal_t avgRankSignal; // Average node rank
+    simsignal_t numNodesSignal; // Num nodes in the network
 
     //////////// Pointers to simulation modules /////////////
 
@@ -28,6 +29,10 @@ class GlobalEventCollector: public EventCollector {
 
     std::vector<RplEngine*> rplEngines;
     std::vector<NodeEventCollector*> nodeCollectors;
+
+    //////////// Stats Data Structures /////////////
+
+    int numNodes;
 
 public:
     GlobalEventCollector();

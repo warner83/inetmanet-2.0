@@ -41,17 +41,17 @@ module RplRouting
             parameters:
                 @display("p=141,43");
         }
-        
-        stats: NodeEventCollector{
+
+        stats: NodeEventCollector {
             parameters:
-                @display("p=141,43");
-            
+                @display("p=50,65");
+
         }
 
     connections:
         ipv6In --> rplEngine.ipv6In;
         ipv6Out <-- rplEngine.ipv6Out;
-        
+
         trickle.engineOut --> rplEngine.trickleIn;
         trickle.engineIn <-- rplEngine.trickleOut;
 }
