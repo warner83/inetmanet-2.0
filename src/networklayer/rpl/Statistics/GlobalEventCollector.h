@@ -11,6 +11,9 @@
 #include <EventCollector.h>
 
 #include <vector>
+#include "Coord.h"
+
+#include "Ieee802154Phy.h"
 
 class RplEngine;
 class NodeEventCollector;
@@ -29,10 +32,20 @@ class GlobalEventCollector: public EventCollector {
 
     std::vector<RplEngine*> rplEngines;
     std::vector<NodeEventCollector*> nodeCollectors;
+    std::vector<Coord> nodePositions;
+    Ieee802154Phy* phy;
 
     //////////// Stats Data Structures /////////////
 
     int numNodes;
+    int rootNode;
+
+    std::vector<std::vector<double> > etx; // Etx for each link, -1 if the link is not formed
+
+    std::vector<std::list<int> > shortest_path; // Shortest path for each node
+    std::vector<double > shortest_cost; // Overall cost of the shortest path
+    std::vector<int > min_hops; // Minimum number of hops
+
 
 public:
     GlobalEventCollector();

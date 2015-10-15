@@ -19,13 +19,20 @@ class INET_API NodeEventCollector : public EventCollector {
     //////////// Signals /////////////
 
     simsignal_t rankSignal;
+    simsignal_t shortestCostSignal;
+    simsignal_t minHopsSignal;
 
+    //////////// Stats Data Structures /////////////
+
+    double shortestCost;
+    int minHops;
 
 public:
     NodeEventCollector();
     virtual ~NodeEventCollector();
 
     void initialize(int stage);
+    virtual int numInitStages()const { return 5; }
 
     //////////// Events to be collected /////////////
 

@@ -21,5 +21,6 @@ simple GlobalEventCollector {
         @statistic[avgRankMetric](title="average rank metric"; source="avgRank"; record=vector,stats; interpolationmode=none);
         
 	    @signal[numNodes](type="long");
-        @statistic[numNodesMetric](title="number of network nodes"; source="numNodes"; record=vector,stats; interpolationmode=none);        
+        @statistic[numNodesMetric](title="number of network nodes"; source="numNodes"; record=vector,stats; interpolationmode=none);
+              
 }

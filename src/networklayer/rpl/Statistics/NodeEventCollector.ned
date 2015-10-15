@@ -17,6 +17,13 @@ package inet.networklayer.rpl.Statistics;
 
 simple NodeEventCollector {
 	parameters:
-	    @signal[rank](type="long");
+	    
+        @signal[rank](type="long");
         @statistic[rankMetric](title="current rank"; source="rank"; record=vector,stats; interpolationmode=none);
+        
+      	@signal[shortestCost](type="long");
+        @statistic[shortestCostMetric](title="shortest cost"; source="shortestCost"; record=vector,stats; interpolationmode=none);
+        
+      	@signal[minHops](type="long");
+        @statistic[minHopsMetric](title="minimum number of hops to root"; source="minHops"; record=vector,stats; interpolationmode=none);
 }

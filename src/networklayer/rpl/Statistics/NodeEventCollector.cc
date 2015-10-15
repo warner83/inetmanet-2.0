@@ -27,6 +27,14 @@ void NodeEventCollector::initialize(int stage){
     if(stage == 0 ){
         // Register signals
         rankSignal = registerSignal("rank");
+        shortestCostSignal = registerSignal("shortestCost");
+        minHopsSignal = registerSignal("minHops");
+    } else if( stage == 4 ){
+        // It is assumed that the global collector has been initialized
+
+        emit(shortestCostSignal, shortestCost);
+        emit(minHopsSignal, minHops);
+
     }
 
     EventCollector::initialize(stage);

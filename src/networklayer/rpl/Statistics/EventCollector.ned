@@ -17,6 +17,6 @@ package inet.networklayer.rpl.Statistics;
 
 moduleinterface EventCollector {
 	parameters:
-	    @signal[rank](type="long");
-        @statistic[rankMetric](title="current rank"; source="rank"; record=vector,stats; interpolationmode=none);
+
+        
 }

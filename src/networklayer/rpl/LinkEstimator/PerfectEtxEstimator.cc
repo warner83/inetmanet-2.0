@@ -8,11 +8,11 @@
 #include <PerfectEtxEstimator.h>
 
 #include "RplUtils.h"
+#include "RplDefs.h"
 
 #include "StationaryMobility.h"
 #include "Ieee802154Phy.h"
 
-#define PKT_SIZE 100
 
 PerfectEtxEstimator::PerfectEtxEstimator() {
     topo.extractByProperty("node");
@@ -45,5 +45,5 @@ double PerfectEtxEstimator::getLinkCost(IPv6Address node) {
     Ieee802154Phy* phy = check_and_cast<Ieee802154Phy*> (owner->getParentModule()->getParentModule()->getParentModule()->getSubmodule("wlan")->getSubmodule("phy"));
 
     // Estimate ETX
-    return phy->getEtx(srcCoord, dstCoord, PKT_SIZE );
+    return phy->getEtx(srcCoord, dstCoord, PKT_SIZE_ETX_ESTIMATION );
 }
