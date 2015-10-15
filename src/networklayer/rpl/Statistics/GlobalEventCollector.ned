@@ -17,8 +17,11 @@ package inet.networklayer.rpl.Statistics;
 
 simple GlobalEventCollector {
 	parameters:
-	    @signal[avgRank](type="long");
-        @statistic[avgRankMetric](title="average rank metric"; source="avgRank"; record=vector,stats; interpolationmode=none);
+	    @signal[firstAvgRank](type="long");
+        @statistic[firstARankMetric](title="average rank metric first dodag"; source="firstAvgRank"; record=vector,stats; interpolationmode=none);
+        
+        @signal[stableAvgRank](type="long");
+        @statistic[stableARankMetric](title="average rank metric stable dodag"; source="stableAvgRank"; record=vector,stats; interpolationmode=none);
         
 	    @signal[numNodes](type="long");
         @statistic[numNodesMetric](title="number of network nodes"; source="numNodes"; record=vector,stats; interpolationmode=none);

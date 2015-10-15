@@ -27,11 +27,14 @@ GlobalEventCollector::~GlobalEventCollector() {
 void GlobalEventCollector::initialize(int stage){
     if( stage == 3 ){
         // Register signals
-        avgRankSignal = registerSignal("avgRank");
+        firstAvgRankSignal = registerSignal("firstAvgRank");
+        stableAvgRankSignal = registerSignal("stableAvgRank");
+
         numNodesSignal = registerSignal("numNodes");
 
         // Get num nodes
         numNodes = topo.getNumNodes();
+        emit(numNodesSignal, numNodes);
 
         // Get pointers to modules
 
@@ -180,9 +183,35 @@ void GlobalEventCollector::initialize(int stage){
 }
 
 void GlobalEventCollector::finish(){
+    // Collect statistics on the stable DODAG
+    stableDodagStats();
+}
 
-    // Num nodes
-    emit(numNodesSignal, numNodes);
+void GlobalEventCollector::nodeJoined(int id){
+    numJoinedNodes++;
+    if(numJoinedNodes == numNodes){
+        // All nodes in the network has joined the DODAG, let count some stats
+        EV << "[STAT] All nodes have joined the DODAG" << endl;
+
+        // Signal to all the nodes that the DODAG is now completed
+        for(int i = 0; i < numNodes; ++i){
+            nodeCollectors[i]->dodagComplete();
+        }
+
+        // Collect statistics on the first DODAG
+        firstDodagStats();
+    }
+}
+
+void GlobalEventCollector::globalReset(){
+    // Check if the dodag is formed
+    if(numJoinedNodes == numNodes){
+        // Collect statistics on the stable DODAG
+        stableDodagStats();
+    }
+}
+
+void GlobalEventCollector::firstDodagStats(){
 
     // Average rank
     double avgRank = 0;
@@ -191,14 +220,19 @@ void GlobalEventCollector::finish(){
         avgRank += rplEngines[i]->rank;
     }
 
-    EV << "[STAT] avgRank " << avgRank/numNodes << endl;
+    emit(firstAvgRankSignal, avgRank/numNodes);
 
-    emit(avgRankSignal, avgRank/numNodes);
 }
 
-void GlobalEventCollector::nodeJoined(int id){
-    numJoinedNodes++;
-    if(numJoinedNodes == numNodes){
-        // All nodes in the network has joined the DODAG, let count some stats
+void GlobalEventCollector::stableDodagStats(){
+    // Average rank
+    double avgRank = 0;
+
+    for(int i = 0; i < numNodes; ++i){
+        avgRank += rplEngines[i]->rank;
     }
+
+    emit(stableAvgRankSignal, avgRank/numNodes);
 }
+
+

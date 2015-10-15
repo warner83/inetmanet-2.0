@@ -33,6 +33,8 @@ class INET_API NodeEventCollector : public EventCollector {
     double shortestCost;
     int minHops;
 
+    bool isRoot;
+
     bool joined;
 
     unsigned int numRecvDios;
@@ -61,6 +63,12 @@ public:
 
     // Global reset
     void globalReset();
+
+    // Dodag complete
+    void dodagComplete();
+
+    // Node is root
+    void nodeRoot();
 
 };
 

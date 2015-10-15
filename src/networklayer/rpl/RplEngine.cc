@@ -142,6 +142,9 @@ void RplEngine::engineInitialize(){
         // Schedule trickle initialization
         scheduleAt(initAbsTime, init_timer);
 
+        // Signal EC that I am root
+        ec->nodeRoot();
+
         EV << "[RPL] Trickle will start at " << initAbsTime << endl;
     } else {
         // Non-root initialization

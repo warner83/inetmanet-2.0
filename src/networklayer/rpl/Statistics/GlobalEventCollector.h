@@ -22,7 +22,9 @@ class GlobalEventCollector: public EventCollector {
 
     //////////// Signals /////////////
 
-    simsignal_t avgRankSignal; // Average node rank
+    simsignal_t firstAvgRankSignal; // Average node rank
+    simsignal_t stableAvgRankSignal; // Average node rank
+
     simsignal_t numNodesSignal; // Num nodes in the network
 
     //////////// Pointers to simulation modules /////////////
@@ -47,6 +49,11 @@ class GlobalEventCollector: public EventCollector {
     std::vector<double > shortest_cost; // Overall cost of the shortest path
     std::vector<int > min_hops; // Minimum number of hops
 
+    // This function is called to collect data on the first DODAG
+    void firstDodagStats();
+
+    // This function is called to collect data on the stable DODAG
+    void stableDodagStats();
 
 public:
     GlobalEventCollector();
@@ -59,6 +66,9 @@ public:
 
     // Each EC uses this function to signal that a node has joined the DODAG
     void nodeJoined(int id);
+
+    // The EC on the root node uses this function to signal the trigger of a global reset
+    void globalReset();
 };
 
 #endif /* GLOBALEVENTCOLLECTOR_H_ */
