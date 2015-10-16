@@ -60,6 +60,10 @@ class INET_API UDPBasicApp : public ApplicationBase
     UDPBasicApp();
     ~UDPBasicApp();
 
+    unsigned int getSentPkt(){
+        return numSent;
+    }
+
   protected:
     virtual int numInitStages() const { return 4; }
     virtual void initialize(int stage);

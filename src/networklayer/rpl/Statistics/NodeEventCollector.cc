@@ -16,6 +16,8 @@
 #include "GlobalEventCollector.h"
 
 #include "RplDefs.h"
+#include "UDPSink.h"
+#include "UDPBasicApp.h"
 
 Define_Module(NodeEventCollector);
 
@@ -36,6 +38,10 @@ NodeEventCollector::NodeEventCollector() {
     curCost = 0;
     curPreferred = INVALID_PARENT;
     numGlobalReset = 0;
+
+    recvPkt = 0;
+    sentPkt = 0;
+    pktLossRatio = 0;
 }
 
 NodeEventCollector::~NodeEventCollector() {
@@ -43,7 +49,7 @@ NodeEventCollector::~NodeEventCollector() {
 }
 
 void NodeEventCollector::initialize(int stage){
-    if(stage == 0 ){
+    if( stage == 1 ){
         // Register signals
         rankSignal = registerSignal("rank");
         shortestCostSignal = registerSignal("shortestCost");
@@ -56,6 +62,19 @@ void NodeEventCollector::initialize(int stage){
 
         emit(shortestCostSignal, shortestCost);
         emit(minHopsSignal, minHops);
+
+        // Get app pointer
+
+        // Get sink
+        sink = gc->getSink();
+
+        // Get my app
+        if( !isRoot && getParentModule()->getParentModule()->getParentModule()->findSubmodule("udpApp", 0) != -1 ){
+            app = check_and_cast<UDPBasicApp *> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("udpApp", 0));
+        } else {
+            // I don't have an app
+            app = NULL;
+        }
 
     }
 
@@ -161,6 +180,26 @@ void NodeEventCollector::logStat(std::string status){
     } else {
         // TODO I should raise some error for disconnected network
     }
+
+    // App stats
+
+    if(!isRoot && app != NULL){
+        // If I have an app evaluate stats
+
+        // Recv data
+        recvPkt = sink->getNumPktRecv(id);
+        // Sent data
+        sentPkt = app->getSentPkt();
+        // Loss ratio
+        pktLossRatio = 1 - ( (double) recvPkt / sentPkt );
+
+        EV << "[STAT] APP " << id << " pkt sent " << sentPkt <<  " pkt recv " << recvPkt << " pkt loss " <<  pktLossRatio << endl;
+
+        finalValue(status+"_app_pkt_loss", pktLossRatio);
+    }
+
+
+
 }
 
 void NodeEventCollector::nodeRoot(){

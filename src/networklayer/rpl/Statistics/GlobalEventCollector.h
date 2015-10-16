@@ -17,6 +17,7 @@
 
 class RplEngine;
 class NodeEventCollector;
+class UDPSink;
 
 class GlobalEventCollector: public EventCollector {
 
@@ -36,6 +37,7 @@ class GlobalEventCollector: public EventCollector {
     std::vector<NodeEventCollector*> nodeCollectors;
     std::vector<Coord> nodePositions;
     Ieee802154Phy* phy;
+    UDPSink* sink;
 
     //////////// Stats Data Structures /////////////
 
@@ -73,6 +75,9 @@ public:
 
     // The EC on the root node uses this function to signal the trigger of a global reset
     void globalReset();
+
+    // The EC on the nodes use this function to recover pointer to the Sink
+    UDPSink* getSink();
 
     // Calculate the current cost to root, the EC of each node uses this function to evaluate the current cost
     double getPathToRoot(int node, std::list<int>& path);

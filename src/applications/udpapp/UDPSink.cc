@@ -24,6 +24,10 @@ Define_Module(UDPSink);
 
 simsignal_t UDPSink::rcvdPkSignal = registerSignal("rcvdPk");
 
+static unsigned int addrToIndex(IPv6Address a){
+    unsigned int n = a.words()[3] & 0xFF;
+    return n - 1 ;
+}
 
 void UDPSink::initialize(int stage)
 {
@@ -70,6 +74,23 @@ void UDPSink::finish()
 void UDPSink::processPacket(cPacket *pk)
 {
     EV << "Received packet: " << UDPSocket::getReceivedPacketInfo(pk) << endl;
+
+    UDPDataIndication *ctrl = check_and_cast<UDPDataIndication *>(pk->getControlInfo());
+
+    IPvXAddress srcAddr = ctrl->getSrcAddr();
+
+    if(srcAddr.isIPv6()){
+        IPv6Address src6addr = srcAddr.get6();
+        int index = addrToIndex(src6addr);
+
+        if( received.find(index) == received.end() ){
+            // First packet from this node
+            received[index] = 1;
+        } else {
+            received[index]++;
+        }
+    }
+
     emit(rcvdPkSignal, pk);
     delete pk;
 
@@ -93,5 +114,13 @@ bool UDPSink::handleNodeShutdown(IDoneCallback *doneCallback)
 
 void UDPSink::handleNodeCrash()
 {
+}
+
+unsigned int UDPSink::getNumPktRecv(int index){
+    if( received.find(index) == received.end() ){
+        return 0;
+    } else {
+        return received[index];
+    }
 }
 

@@ -11,6 +11,7 @@
 #include "NodeEventCollector.h"
 #include "StationaryMobility.h"
 #include "RplDefs.h"
+#include "UDPSink.h"
 
 Define_Module(GlobalEventCollector);
 
@@ -53,6 +54,10 @@ double GlobalEventCollector::getPathToRoot(int node){
     double cost = getPathToRoot(node, path);
 
     return cost;
+}
+
+UDPSink* GlobalEventCollector::getSink(){
+    return sink;
 }
 
 void GlobalEventCollector::initialize(int stage){
@@ -210,6 +215,10 @@ void GlobalEventCollector::initialize(int stage){
 
     }
 
+    // Get pointer to UDPSink
+    cModule *mod = topo.getNode(rootNode)->getModule();
+    sink = check_and_cast<UDPSink *> (mod->getSubmodule("udpApp", 0));
+
     EventCollector::initializeChannels(stage);
 }
 
@@ -236,6 +245,7 @@ void GlobalEventCollector::nodeJoined(int id){
 
 void GlobalEventCollector::globalReset(){
     stableDodagStats();
+
 }
 
 void GlobalEventCollector::firstDodagStats(){
@@ -245,13 +255,14 @@ void GlobalEventCollector::firstDodagStats(){
 void GlobalEventCollector::stableDodagStats(){
     // Check if the dodag is formed
     if(numJoinedNodes == numNodes){
-        // Collect statistics on the stable DODAG
-        logStat("stable");
 
         // Signal to all the nodes that the DODAG is stable
         for(int i = 0; i < numNodes; ++i){
             nodeCollectors[i]->stableDodagStats();
         }
+
+        // Collect statistics on the stable DODAG
+        logStat("stable");
     }
 }
 
@@ -318,6 +329,33 @@ void GlobalEventCollector::logStat(std::string status){
     avg_rank /= numNodes;
 
     finalValue(status+"_totalAvgRank", avg_rank);
+
+    // Evaluate app data
+
+    unsigned int totalRecvPkt = 0;
+    unsigned int totalSentPkt = 0;
+    double totalPktLossRatio = 0;
+
+    for(int i = 0; i < numNodes; ++i){
+        if(i == rootNode)
+            continue;
+
+        if( nodeCollectors[i]->app == NULL )
+            continue; // This node does not have an app
+
+        // Recv data
+        totalRecvPkt += nodeCollectors[i]->recvPkt;
+        // Sent data
+        totalSentPkt += nodeCollectors[i]->sentPkt;
+    }
+
+    // Loss ratio
+    totalPktLossRatio = 1 - ( (double) totalRecvPkt / totalSentPkt );
+
+    EV << "[STAT] Overall app performance " << " pkt sent " << totalSentPkt <<  " pkt recv " << totalRecvPkt << " pkt loss " <<  totalPktLossRatio << endl;
+
+    finalValue(status+"_total_pkt_loss", totalPktLossRatio);
+
 
     //emit(stableAvgRankSignal, avgRank);
     //emit(firstAvgRankSignal, avgRank);

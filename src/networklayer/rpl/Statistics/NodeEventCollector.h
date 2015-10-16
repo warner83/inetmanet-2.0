@@ -15,6 +15,8 @@
 
 class DIOmessage;
 class GlobalEventCollector;
+class UDPSink;
+class UDPBasicApp;
 
 class INET_API NodeEventCollector : public EventCollector {
 
@@ -50,6 +52,14 @@ class INET_API NodeEventCollector : public EventCollector {
     unsigned int curRank;
     double curCost;
     unsigned int numGlobalReset;
+
+    // Application level stats
+    UDPSink* sink;
+    UDPBasicApp* app; // TODO change to generic app
+
+    unsigned int recvPkt;
+    unsigned int sentPkt;
+    double pktLossRatio;
 
 public:
     NodeEventCollector();

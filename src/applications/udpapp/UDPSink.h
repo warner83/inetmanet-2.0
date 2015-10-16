@@ -36,6 +36,8 @@ class INET_API UDPSink : public ApplicationBase
     int numReceived;
     static simsignal_t rcvdPkSignal;
 
+    std::map<unsigned int,unsigned int> received;
+
   protected:
     virtual void processPacket(cPacket *msg);
 
@@ -48,6 +50,9 @@ class INET_API UDPSink : public ApplicationBase
     virtual bool handleNodeStart(IDoneCallback *doneCallback);
     virtual bool handleNodeShutdown(IDoneCallback *doneCallback);
     virtual void handleNodeCrash();
+
+  public:
+    unsigned int getNumPktRecv(int index);
 };
 
 #endif

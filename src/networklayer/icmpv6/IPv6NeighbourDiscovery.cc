@@ -2699,7 +2699,15 @@ void IPv6NeighbourDiscovery::addNeighbour(const IPv6Address& addr, int interface
 
     // If null add an entry
     if(n == NULL){
-        n = neighbourCache.addRouter(addr, interfaceID, macAddress, 0);
+
+        //n = neighbourCache.addRouter(addr, interfaceID, macAddress, simTime());
+        n = neighbourCache.addNeighbour(addr, interfaceID, macAddress);
+    } else {
+        // The address has been already registered
+        if( n->macAddress == MACAddress::UNSPECIFIED_ADDRESS ){
+            // If the mac address is unspecified update the mac address
+            n->macAddress = macAddress;
+        }
     }
 
     // Force reachability
