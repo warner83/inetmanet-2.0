@@ -12,6 +12,11 @@
 #include "StationaryMobility.h"
 #include "RplDefs.h"
 #include "UDPSink.h"
+#include "Coord.h"
+
+#include <sstream>
+#include <string>
+#include <fstream>
 
 Define_Module(GlobalEventCollector);
 
@@ -223,6 +228,8 @@ void GlobalEventCollector::initialize(int stage){
 
         }
 
+        // Save nodes position to file
+        saveMapToFile("map.dat");
 
     }
 
@@ -231,6 +238,21 @@ void GlobalEventCollector::initialize(int stage){
     sink = check_and_cast<UDPSink *> (mod->getSubmodule("udpApp", 0));
 
     EventCollector::initializeChannels(stage);
+}
+
+void GlobalEventCollector::saveMapToFile(std::string fileName){
+    std::ofstream mapfile(fileName.c_str(), std::ios::out | std::ios::trunc);
+
+    for (int i=0; i<topo.getNumNodes(); i++)
+    {
+        cModule *mod = topo.getNode(i)->getModule();
+
+        StationaryMobility* mob = check_and_cast<StationaryMobility *> (mod->getSubmodule("mobility"));
+
+        mapfile << i <<  " " << mob->getCurrentPosition().x << " " << mob->getCurrentPosition().y << "\n";
+
+    }
+    mapfile.close();
 }
 
 void GlobalEventCollector::finish(){

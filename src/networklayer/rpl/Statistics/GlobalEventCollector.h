@@ -51,15 +51,17 @@ class GlobalEventCollector: public EventCollector {
     std::vector<double > shortest_cost; // Overall cost of the shortest path
     std::vector<int > min_hops; // Minimum number of hops
 
+    //////////// Stats Functions /////////////
+
+    void logStat(std::string status);
+
+    void saveMapToFile(std::string fileName);
+
     // This function is called to collect data on the first DODAG
     void firstDodagStats();
 
     // This function is called to collect data on the stable DODAG
     void stableDodagStats();
-
-    //////////// Stats Functions /////////////
-
-    void logStat(std::string status);
 
 public:
     GlobalEventCollector();
