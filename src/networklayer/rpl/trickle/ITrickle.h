@@ -14,14 +14,21 @@
 
 #include "INETDefs.h"
 
+#include "NodeEventCollector.h"
+
 class INET_API ITrickle: public cSimpleModule {
 
 protected:
+
+    NodeEventCollector* ec;
+
     void signalEngine(int kind);
 
 public:
     ITrickle();
     virtual ~ITrickle();
+
+    void initialize(int stage);
 
     // Called when a reset is needed
     virtual void reset() = 0;

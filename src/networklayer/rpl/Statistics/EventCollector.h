@@ -12,6 +12,8 @@
 
 #include <omnetpp.h>
 
+#include <string.h>
+
 // Basic class for NODE event collector
 
 class INET_API EventCollector : public cSimpleModule  {
@@ -30,13 +32,13 @@ protected:
     //////////// Utility functions /////////////
 
     // Trace value over time
-    void traceValue(std::string metric, int id, double value, int id2);
+    void traceValue(std::string metric, double value, int id2 = -1);
 
     // Trace value periodically over time
-    void tracePeriodicValue(std::string metric, int id, double value, int id2);
+    void tracePeriodicValue(std::string metric, double value, int id2 = -1);
 
     // Store final value
-    void finalValue(std::string metric, int id, double value, int id2 = -1);
+    void finalValue(std::string metric, double value, int id2 = -1);
 
 public:
     EventCollector();

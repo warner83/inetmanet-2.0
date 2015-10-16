@@ -239,15 +239,6 @@ void RplEngine::handleMessage(cMessage *msg)
                             // Reset trickle
                             signalTrickle(rpl_reset);
 
-                            // Updated rank ?
-                            if(rank != of->getRank()){
-                                // Update rank
-                                rank = of->getRank();
-
-                                // Signal event to EC
-                                ec->rankChanged(rank, of->getCost());
-                            }
-
                             // Change PP ?
                             if( preferredParent.compare(of->getPP()) != 0 ){
                                 // Set the new preferred parent
@@ -258,6 +249,15 @@ void RplEngine::handleMessage(cMessage *msg)
 
                                 // Signal event to EC
                                 ec->preferredParentChanged(addrToIndex(preferredParent));
+                            }
+
+                            // Updated rank ?
+                            if(rank != of->getRank()){
+                                // Update rank
+                                rank = of->getRank();
+
+                                // Signal event to EC
+                                ec->rankChanged(rank);
                             }
 
                             EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;

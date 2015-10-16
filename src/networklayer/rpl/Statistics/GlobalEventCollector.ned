@@ -17,6 +17,12 @@ package inet.networklayer.rpl.Statistics;
 
 simple GlobalEventCollector {
 	parameters:
+	    
+	    string directory = default("/mnt/ram/");
+	    bool timeline = default(false);
+        bool periodic = default(false);
+        double period = default(100);
+	    
 	    @signal[firstAvgRank](type="long");
         @statistic[firstARankMetric](title="average rank metric first dodag"; source="firstAvgRank"; record=vector,stats; interpolationmode=none);
         

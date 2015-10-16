@@ -58,12 +58,18 @@ void TrickleF::intervalEnded(){
 
     EV << "Trickle: Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
     EV << "TrickleF: firing interval " << curInt / (pow(2, suppressedDIOs + 1) ) << ", " <<  curInt / (pow(2, suppressedDIOs)) << endl;
+
+    // Signal EC
+    ec->intervalBegin(curInt);
 }
 
 void TrickleF::messageFired() {
     if( numMessagesReceived > redundancy ){
         // I'm going to suppress the broadcast, update the counter
         suppressedDIOs++;
+
+        // Signal EC
+        ec->messageSuppressed();
     } else {
         // I'm sending my DIO message, reset the counter
         suppressedDIOs = 0;

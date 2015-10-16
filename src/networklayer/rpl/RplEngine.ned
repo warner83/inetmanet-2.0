@@ -27,7 +27,7 @@ simple RplEngine{
         double initTime @unit("s") = default(1s);
         
         // Global reset timer
-        double resetTime @unit("s") = default(10s);  
+        double resetTime @unit("s") = default(100000000s);  
         
         // OF selected
         string objectiveFunctionType = default("OFzero");

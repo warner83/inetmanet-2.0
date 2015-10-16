@@ -24,6 +24,37 @@ GlobalEventCollector::~GlobalEventCollector() {
     // TODO Auto-generated destructor stub
 }
 
+double GlobalEventCollector::getPathToRoot(int node, std::list<int>& path){
+    double cost = 0;
+
+    int actual = node;
+    path.push_back(actual);
+    while( actual != rootNode ){
+        if(actual == -1){
+            // The node is still disconnected
+            return -1;
+        }
+
+        int next = nodeCollectors[actual]->curPreferred;
+        double c = etx[actual][next];
+
+        cost += c;
+        actual = next;
+
+        path.push_back(actual);
+    }
+
+    return cost;
+}
+
+double GlobalEventCollector::getPathToRoot(int node){
+    std::list<int> path;
+
+    double cost = getPathToRoot(node, path);
+
+    return cost;
+}
+
 void GlobalEventCollector::initialize(int stage){
     if( stage == 3 ){
         // Register signals
@@ -195,7 +226,7 @@ void GlobalEventCollector::nodeJoined(int id){
 
         // Signal to all the nodes that the DODAG is now completed
         for(int i = 0; i < numNodes; ++i){
-            nodeCollectors[i]->dodagComplete();
+            nodeCollectors[i]->firstDodagStats();
         }
 
         // Collect statistics on the first DODAG
@@ -204,35 +235,92 @@ void GlobalEventCollector::nodeJoined(int id){
 }
 
 void GlobalEventCollector::globalReset(){
-    // Check if the dodag is formed
-    if(numJoinedNodes == numNodes){
-        // Collect statistics on the stable DODAG
-        stableDodagStats();
-    }
+    stableDodagStats();
 }
 
 void GlobalEventCollector::firstDodagStats(){
-
-    // Average rank
-    double avgRank = 0;
-
-    for(int i = 0; i < numNodes; ++i){
-        avgRank += rplEngines[i]->rank;
-    }
-
-    emit(firstAvgRankSignal, avgRank/numNodes);
-
+    logStat("first");
 }
 
 void GlobalEventCollector::stableDodagStats(){
-    // Average rank
-    double avgRank = 0;
+    // Check if the dodag is formed
+    if(numJoinedNodes == numNodes){
+        // Collect statistics on the stable DODAG
+        logStat("stable");
 
-    for(int i = 0; i < numNodes; ++i){
-        avgRank += rplEngines[i]->rank;
+        // Signal to all the nodes that the DODAG is stable
+        for(int i = 0; i < numNodes; ++i){
+            nodeCollectors[i]->stableDodagStats();
+        }
     }
-
-    emit(stableAvgRankSignal, avgRank/numNodes);
 }
 
+void GlobalEventCollector::logStat(std::string status){
+
+    // Find all the max values
+    simtime_t max_stable = 0; // The stable time is the time when the last PP change happened in the network
+    unsigned int max_rank = 0;
+    double max_cost = 0;
+    for(int i = 0; i < numNodes; ++i){
+        if( max_stable < nodeCollectors[i]->lastPreferredChanged ){
+            max_stable = nodeCollectors[i]->lastPreferredChanged;
+        }
+
+        if( max_rank < nodeCollectors[i]->curRank){
+            max_rank = nodeCollectors[i]->curRank;
+        }
+
+        if( max_cost < nodeCollectors[i]->curCost){
+            max_cost = nodeCollectors[i]->curCost;
+        }
+
+    }
+
+    if(status.compare("first") == 0)
+        finalValue("first_time", simTime().dbl() );
+
+    if(status.compare("stable") == 0)
+        finalValue("stable_time", max_stable.dbl() );
+
+    finalValue(status+"_totalMaxRank", max_rank);
+    finalValue(status+"_totalMaxCost", max_cost);
+
+
+    // Get totals from all the nodes
+
+    unsigned int total_rpl_recv = 0;
+    unsigned int total_rpl_send = 0;
+    unsigned int parent_changed = 0;
+    double overall_stretch = 0;
+    unsigned int overall_suppressed = 0;
+
+    for(int i = 0; i < numNodes; ++i){
+        total_rpl_recv += nodeCollectors[i]->numRecvDios;
+        total_rpl_send += nodeCollectors[i]->numSentDios;
+        parent_changed += nodeCollectors[i]->numPreferredChanged;
+        overall_suppressed += nodeCollectors[i]->numSuppressedDios;
+        overall_stretch += nodeCollectors[i]->curCost - nodeCollectors[i]->shortestCost;
+    }
+
+    finalValue(status+"_totalRplRcv", total_rpl_recv);
+    finalValue(status+"_totalRplSend", total_rpl_send);
+    finalValue(status+"_total_parent_changed", parent_changed);
+    finalValue(status+"_overall_routing_shortest_stretch", overall_stretch);
+    finalValue(status+"_overall_suppressed_dio", overall_suppressed);
+
+    // Get all the average values
+    double avg_rank = 0;
+
+    for(int i = 0; i < numNodes; ++i){
+        avg_rank += rplEngines[i]->rank;
+    }
+
+    avg_rank /= numNodes;
+
+    finalValue(status+"_totalAvgRank", avg_rank);
+
+    //emit(stableAvgRankSignal, avgRank);
+    //emit(firstAvgRankSignal, avgRank);
+
+}
 

@@ -15,14 +15,27 @@
 
 #include "GlobalEventCollector.h"
 
+#include "RplDefs.h"
 
 Define_Module(NodeEventCollector);
 
 NodeEventCollector::NodeEventCollector() {
-    numRecvDios = 0;
-    numSentDios = 0;
     joined = false;
     isRoot = false;
+
+    numRecvDios = 0;
+    numSentDios = 0;
+    numSuppressedDios = 0;
+    curInt = 0;
+    numIntReset = 0;
+    numInt = 0;
+    numIntDoubled = 0;
+    lastPreferredChanged = 0;
+    numPreferredChanged = 0;
+    curRank = 0;
+    curCost = 0;
+    curPreferred = INVALID_PARENT;
+    numGlobalReset = 0;
 }
 
 NodeEventCollector::~NodeEventCollector() {
@@ -49,17 +62,42 @@ void NodeEventCollector::initialize(int stage){
     EventCollector::initialize(stage);
 }
 
-void NodeEventCollector::dioSent(DIOmessage* msg){\
+void NodeEventCollector::intervalBegin(double i){
 
+    if(curInt != 0){ // This is not the first interval
+        if( (curInt * 2) == i ){
+            // I has been doubled
+            numIntDoubled++;
+        } else {
+            // This is a reset
+            numIntReset++;
+        }
+    }
+
+    curInt = i;
+    numInt++;
+}
+
+void NodeEventCollector::messageSuppressed(){
+    numSuppressedDios++;
+}
+
+void NodeEventCollector::dioSent(DIOmessage* msg){
+    numSentDios++;
+
+    traceValue("rplPktSend", numSentDios );
 }
 
 void NodeEventCollector::dioReceived(DIOmessage* msg){
+    numRecvDios++;
 
+    traceValue("rplPktRecv", numRecvDios);
 }
 
-void NodeEventCollector::rankChanged(int newRank, double cost){
+void NodeEventCollector::rankChanged(int newRank){
 
-    EV << "[STAT] rankChanged " << newRank << endl;
+    curRank = newRank;
+    curCost = gc->getPathToRoot(id);
 
     if(!joined){
         // The node has just joined the network
@@ -69,11 +107,19 @@ void NodeEventCollector::rankChanged(int newRank, double cost){
         gc->nodeJoined(id);
     }
 
-    emit(rankSignal, newRank);
+    traceValue("rank", curRank);
+    traceValue("cost", curCost);
+
 }
 
 void NodeEventCollector::preferredParentChanged(int index){
+    curPreferred = index;
 
+    lastPreferredChanged = simTime();
+
+    numPreferredChanged++;
+
+    traceValue("preferredParent",index);
 }
 
 void NodeEventCollector::globalReset(){
@@ -87,10 +133,34 @@ void NodeEventCollector::globalReset(){
     } else {
         joined = false;
     }
+
+    numGlobalReset++;
 }
 
-void NodeEventCollector::dodagComplete(){
+void NodeEventCollector::firstDodagStats(){
+    logStat("first");
+}
 
+void NodeEventCollector::stableDodagStats(){
+    logStat("stable");
+}
+
+void NodeEventCollector::logStat(std::string status){
+    finalValue(status+"_rplRecv", numRecvDios);
+    finalValue(status+"_rplSend", numSentDios);
+    finalValue(status+"_i_size", curInt);
+    finalValue(status+"_i_doubled", numIntDoubled);
+    finalValue(status+"_suppressed_dio", numSuppressedDios);
+
+    if(curCost >= 0){ // Negative cost -> disconnected network
+
+        EV << "[STAT] Update stretch cur cost " << curCost << " shortest " << shortestCost << endl;
+
+        finalValue(status+"_routing_shortest_stretch", curCost - shortestCost);
+
+    } else {
+        // TODO I should raise some error for disconnected network
+    }
 }
 
 void NodeEventCollector::nodeRoot(){

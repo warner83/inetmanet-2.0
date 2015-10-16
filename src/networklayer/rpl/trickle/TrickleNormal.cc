@@ -46,6 +46,8 @@ void TrickleNormal::initialize(int stage)
         redundancy = par("redundancy").doubleValue();
 
     }
+
+    ITrickle::initialize(stage);
 }
 
 void TrickleNormal::scheduleMessageAt(double t){
@@ -109,6 +111,9 @@ void TrickleNormal::initializeTrickle(){
     scheduleMessageAt(nextMsg);
     scheduleIntervalAt(nextInt);
 
+    // Signal EC
+    ec->intervalBegin(curInt);
+
 }
 
 void TrickleNormal::reset(){
@@ -148,6 +153,9 @@ void TrickleNormal::intervalEnded(){
     scheduleIntervalAt(nextInt);
 
     EV << "[TRICKLE] Interval ended at " << simTime() << " new interval length " <<  curInt << " next message at " << nextMsg << endl;
+
+    // Signal EC
+    ec->intervalBegin(curInt);
 }
 
 void TrickleNormal::messageFired() {
@@ -158,6 +166,9 @@ void TrickleNormal::messageFired() {
         signalEngine(send_dio_message);
     } else {
         EV << "[TRICKLE] DIO suppressed " << numMessagesReceived << endl;
+
+        // Signal EC
+        ec->messageSuppressed();
     }
 }
 

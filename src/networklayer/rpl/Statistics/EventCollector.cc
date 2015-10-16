@@ -25,11 +25,13 @@ EventCollector::~EventCollector() {
 void EventCollector::initialize(int stage){
     if(stage==0){
         // Local variable initialization
-        timeline = false;
         start = false;
-        periodic = false;
-        period = 0;
-        directory = ".";
+
+        // Get params
+        timeline = par("timeline").boolValue();
+        periodic = par("periodic").boolValue();
+        period = par("period").doubleValue();
+        directory = par("directory").stringValue();
 
     }
 }
@@ -39,7 +41,7 @@ void EventCollector::setID(int i){
 }
 
 
-void EventCollector::traceValue(std::string metric, int id, double value, int id2){
+void EventCollector::traceValue(std::string metric, double value, int id2){
     if(!timeline)
         return;
 
@@ -64,7 +66,8 @@ void EventCollector::traceValue(std::string metric, int id, double value, int id
     }
 }
 
-void EventCollector::tracePeriodicValue(std::string metric, int id, double value, int id2){
+
+void EventCollector::tracePeriodicValue(std::string metric, double value, int id2){
     if(!periodic)
         return;
 
@@ -89,7 +92,8 @@ void EventCollector::tracePeriodicValue(std::string metric, int id, double value
     }
 }
 
-void EventCollector::finalValue(std::string metric, int id, double value, int id2){
+
+void EventCollector::finalValue(std::string metric, double value, int id2){
     // Build filename
     int run =simulation.getActiveEnvir()->getConfigEx()->getActiveRunNumber();
     std::ostringstream name;

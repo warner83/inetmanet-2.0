@@ -39,6 +39,17 @@ class INET_API NodeEventCollector : public EventCollector {
 
     unsigned int numRecvDios;
     unsigned int numSentDios;
+    unsigned int numSuppressedDios;
+    double curInt;
+    unsigned int numIntDoubled;
+    unsigned int numIntReset;
+    unsigned int numInt;
+    simtime_t lastPreferredChanged;
+    unsigned int numPreferredChanged;
+    int curPreferred;
+    unsigned int curRank;
+    double curCost;
+    unsigned int numGlobalReset;
 
 public:
     NodeEventCollector();
@@ -49,6 +60,12 @@ public:
 
     //////////// Events to be collected /////////////
 
+    // Trickle interval begins
+    void intervalBegin(double i);
+
+    // Trickle has suppressed a message
+    void messageSuppressed();
+
     // DIOmessage sent
     void dioSent(DIOmessage* msg);
 
@@ -56,7 +73,7 @@ public:
     void dioReceived(DIOmessage* msg);
 
     // Rank changed
-    void rankChanged(int newRank, double cost);
+    void rankChanged(int newRank);
 
     // PP changed
     void preferredParentChanged(int index);
@@ -65,7 +82,13 @@ public:
     void globalReset();
 
     // Dodag complete
-    void dodagComplete();
+    void firstDodagStats();
+
+    // Stable dodag complete
+    void stableDodagStats();
+
+    // Log stats
+    void logStat(std::string status);
 
     // Node is root
     void nodeRoot();

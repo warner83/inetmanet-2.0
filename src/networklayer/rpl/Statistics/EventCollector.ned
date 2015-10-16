@@ -16,7 +16,12 @@
 package inet.networklayer.rpl.Statistics;
 
 moduleinterface EventCollector {
+    
 	parameters:
-
+	    @display("i=block/cogwheel_s");
+		bool timeline;
+        bool periodic;
+        double period;
         
+        string directory;
 }

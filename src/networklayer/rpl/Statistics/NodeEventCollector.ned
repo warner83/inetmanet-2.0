@@ -18,6 +18,11 @@ package inet.networklayer.rpl.Statistics;
 simple NodeEventCollector {
 	parameters:
 	    
+	    string directory = default("/mnt/ram/");
+	    bool timeline = default(false);
+        bool periodic = default(false);
+        double period = default(100);
+	    
         @signal[rank](type="long");
         @statistic[rankMetric](title="current rank"; source="rank"; record=vector,stats; interpolationmode=none);
         

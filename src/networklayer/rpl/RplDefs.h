@@ -15,6 +15,8 @@
 
 #define INVALID_DODAG_VERSION       0
 
+#define INVALID_PARENT              -1
+
 #define PREFERRED_PARENT_SIZE       3
 
 #define MAX_ETX                     5

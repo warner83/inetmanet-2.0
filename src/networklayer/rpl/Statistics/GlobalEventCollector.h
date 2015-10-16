@@ -55,6 +55,10 @@ class GlobalEventCollector: public EventCollector {
     // This function is called to collect data on the stable DODAG
     void stableDodagStats();
 
+    //////////// Stats Functions /////////////
+
+    void logStat(std::string status);
+
 public:
     GlobalEventCollector();
     virtual ~GlobalEventCollector();
@@ -69,6 +73,10 @@ public:
 
     // The EC on the root node uses this function to signal the trigger of a global reset
     void globalReset();
+
+    // Calculate the current cost to root, the EC of each node uses this function to evaluate the current cost
+    double getPathToRoot(int node, std::list<int>& path);
+    double getPathToRoot(int node);
 };
 
 #endif /* GLOBALEVENTCOLLECTOR_H_ */
