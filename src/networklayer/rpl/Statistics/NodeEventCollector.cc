@@ -49,7 +49,17 @@ NodeEventCollector::~NodeEventCollector() {
 }
 
 void NodeEventCollector::initialize(int stage){
-    if( stage == 1 ){
+    if(stage==0){
+        // Local variable initialization
+        start = false;
+
+        // Get params
+        timeline = par("timeline").boolValue();
+        periodic = par("periodic").boolValue();
+        period = par("period").doubleValue();
+        outDir = par("directory").stringValue();
+
+    } else if( stage == 1 ){
         // Register signals
         rankSignal = registerSignal("rank");
         shortestCostSignal = registerSignal("shortestCost");

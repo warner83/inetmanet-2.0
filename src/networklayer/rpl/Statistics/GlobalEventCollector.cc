@@ -61,7 +61,18 @@ UDPSink* GlobalEventCollector::getSink(){
 }
 
 void GlobalEventCollector::initialize(int stage){
-    if( stage == 3 ){
+
+    if(stage==0){
+        // Local variable initialization
+        start = false;
+
+        // Get params
+        timeline = par("timeline").boolValue();
+        periodic = par("periodic").boolValue();
+        period = par("period").doubleValue();
+        outDir = par("directory").stringValue();
+
+    } else if( stage == 3 ){
         // Register signals
         firstAvgRankSignal = registerSignal("firstAvgRank");
         stableAvgRankSignal = registerSignal("stableAvgRank");
@@ -136,7 +147,7 @@ void GlobalEventCollector::initialize(int stage){
 
         // Implement Dijkstra alg
 
-        #define INFINITY 10000000000
+        #define INF 10000000000
         #define UNDEF -1
 
         std::vector<double> dist;
@@ -145,9 +156,9 @@ void GlobalEventCollector::initialize(int stage){
         prev.reserve(numNodes);
         std::map<int, double> Q;
         for (int i=0; i<numNodes; i++){
-            dist[i]=INFINITY;
+            dist[i]=INF;
             prev[i]=UNDEF;
-            Q[i] = INFINITY;
+            Q[i] = INF;
         }
 
         dist[rootNode] = 0;
@@ -156,7 +167,7 @@ void GlobalEventCollector::initialize(int stage){
         while( Q.size() > 0 ){
             // Find smallest distance
             int min;
-            double min_cost = INFINITY;
+            double min_cost = INF;
             std::map<int, double>::iterator it;
             for( it = Q.begin(); it != Q.end(); ++it ){
                 if( min_cost > (*it).second ){
@@ -166,7 +177,7 @@ void GlobalEventCollector::initialize(int stage){
                 }
             }
 
-           if( min_cost == INFINITY )
+           if( min_cost == INF )
                 opp_error("Disconnected network");
 
            Q.erase(min);

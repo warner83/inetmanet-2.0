@@ -22,7 +22,7 @@ protected:
 
     //////////// Utility data       /////////////
 
-    std::string directory; // Output path
+    std::string outDir; // Output path
     bool start; // True if trace is active
     bool timeline; // True if stat timeline is active
     bool periodic; // True if stat periodic collection is active

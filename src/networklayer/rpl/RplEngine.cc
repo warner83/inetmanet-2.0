@@ -55,7 +55,6 @@ void RplEngine::initialize(int stage)
 
         // Recover params
         isRoot = par("isRoot").boolValue();
-        registerNeigh = par("registerNeigh").boolValue();
 
         // Get pointer to Event Collector
         ec = check_and_cast<NodeEventCollector*> (this->getParentModule()->getSubmodule("stats"));
@@ -284,14 +283,6 @@ void RplEngine::handleMessage(cMessage *msg)
             } else {
                 EV << "[RPL] unknown rpl message from network " << rplMessage->getCode() << endl;
                 abort();
-            }
-
-            // This mode let RPL registering directly neighbors in the NeighborCache Table, this disable ND procedure
-            if(registerNeigh){
-                // Register the source of the source node of the RPL packet
-                nd->addNeighbour(rplMessage->getSrc(), ie->getInterfaceId(), rplMessage->getMacSrc());
-
-                EV << "[RPL] Neighbor registered " << rplMessage->getSrc() << " mac " << rplMessage->getMacSrc() << endl;
             }
 
         } else if( strcmp(msg->getArrivalGate()->getFullName(), "trickleIn" ) == 0 ){

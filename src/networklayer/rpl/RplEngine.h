@@ -63,9 +63,6 @@ class INET_API RplEngine : public cSimpleModule {
     // Am I root?
     bool isRoot;
 
-    // Enable ND Cache autoregistration
-    bool registerNeigh;
-
     // Initialized? set to true when the first DIO is received. Always true if root!
     bool initialized;
 
