@@ -122,6 +122,8 @@ void UDPBasicApp::sendPacket()
 
     IPvXAddress destAddr = chooseDestAddr();
 
+    EV << "UDP sending packet " << msgName << endl;
+
     emit(sentPkSignal, payload);
     socket.sendTo(payload, destAddr, destPort);
     numSent++;

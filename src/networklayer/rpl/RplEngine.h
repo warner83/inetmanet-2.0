@@ -66,6 +66,10 @@ class INET_API RplEngine : public cSimpleModule {
     // Initialized? set to true when the first DIO is received. Always true if root!
     bool initialized;
 
+    // Enable ND Cache autoregistration
+    bool registerNeigh;
+
+
     // Current rank of the node
     unsigned int rank;
 

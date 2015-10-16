@@ -34,6 +34,10 @@ simple RplEngine{
         
         // Link estimator selected
         string linkEstimatorType = default("PerfectEtx");
+        
+        // Enable auto registration of neighbors in the ND Cache
+		bool registerNeigh = default(true);
+        
                                        
     gates:
         input ipv6In;
