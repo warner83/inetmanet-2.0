@@ -10,6 +10,7 @@
 
 #include "EventCollector.h"
 #include "Coord.h"
+#include "IPv6ControlInfo.h"
 
 // Class for NODE event collector
 
@@ -55,6 +56,9 @@ class INET_API NodeEventCollector : public EventCollector {
     unsigned int sentPkt;
     double pktLossRatio;
 
+    //////////// Utility Functions //////////////
+    unsigned int addrToIndex(IPv6Address a);
+
 public:
     NodeEventCollector();
     virtual ~NodeEventCollector();
@@ -82,7 +86,7 @@ public:
     void rankChanged(int newRank);
 
     // PP changed
-    void preferredParentChanged(int index);
+    void preferredParentChanged(IPv6Address pp);
 
     // Global reset
     void globalReset();
@@ -98,6 +102,9 @@ public:
 
     // Node is root
     void nodeRoot();
+
+    // Set module ID from IPv6 address
+    void setID(IPv6Address i);
 
 };
 

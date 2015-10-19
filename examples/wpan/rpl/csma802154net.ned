@@ -28,13 +28,13 @@ network csma802154net
 {
     parameters:
         int numFixHosts;
-        double nodeSeparation @unit("m")=default (50m);
+        double nodeSeparation @unit("m") = default(50m);
     submodules:
         fixhost[numFixHosts]: nodecsma802154 {
             parameters:
-              y =  (floor(index/sqrt(numFixHosts))*nodeSeparation)+(nodeSeparation);
-              x = ((index%floor(sqrt(numFixHosts)))*nodeSeparation)+(nodeSeparation);
-              @display("i=device/pocketpc_s;r=,,#707070");
+                y = (floor(index/sqrt(numFixHosts))*nodeSeparation)+(nodeSeparation);
+                x = ((index%floor(sqrt(numFixHosts)))*nodeSeparation)+(nodeSeparation);
+                @display("i=device/pocketpc_s;r=,,#707070");
         }
         channelControl: ChannelControl {
             parameters:
@@ -42,12 +42,10 @@ network csma802154net
         }
         configurator: FlatNetworkConfigurator6 {
             //config=xml("<config><interface hosts='*' address='145.236.x.x' netmask='255.255.0.0'/></config>");
-            @display("p=140,50");
+            @display("p=166,65");
         }
-        
-        globalStats: GlobalEventCollector {
-        
-        }
+
+        globalStats: GlobalEventCollector;
     connections allowunconnected:
 }
 

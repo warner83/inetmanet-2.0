@@ -37,13 +37,11 @@ struct parent{
     double linkMetric; // Link metric
     double cost; // overall cost (OF dependent)
     IPv6Address addr;
-    int index;
 
-    parent(double r, double lm, double c, IPv6Address a, int i ){
+    parent(double r, double lm, double c, IPv6Address a ){
         rank = r;
         linkMetric = lm;
         cost = c;
-        index = i;
         addr = a;
     }
 

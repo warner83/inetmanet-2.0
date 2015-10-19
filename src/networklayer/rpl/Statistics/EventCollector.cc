@@ -35,9 +35,7 @@ void EventCollector::initialize(int stage){
     scheduleAt(simTime()+period, periodic_collection );
 }
 
-void EventCollector::setID(int i){
-    id = i;
-}
+
 
 void EventCollector::registerRplStatSignal(std::string name){
 

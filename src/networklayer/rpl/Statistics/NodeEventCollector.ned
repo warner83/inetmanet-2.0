@@ -19,8 +19,8 @@ simple NodeEventCollector {
 	parameters:
 	    
 	    string directory = default("/mnt/ram/");
-	    bool timeline = default(true);
-        bool periodic = default(true);
+	    bool timeline = default(false);
+        bool periodic = default(false);
         double period = default(100);
         
         bool onlyOmnetStats = default(false);

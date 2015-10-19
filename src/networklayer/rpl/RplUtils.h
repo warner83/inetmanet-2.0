@@ -8,12 +8,14 @@
 #ifndef RPLUTILS_H_
 #define RPLUTILS_H_
 
-// Utility function to convert the IPv6 address to an index. The less significant 32 bits are taken to create the index
-static unsigned int addrToIndex(IPv6Address a){
-    unsigned int n = a.words()[3] & 0xFF;
-    return n - 1 ;
-}
+// Utility class to convert the IPv6 address to an index. The less significant 32 bits are taken to create the index
 
-#define NODE_INDEX addrToIndex(myIp)
+// This function requires to know the number of nodes
+// The value is initialized by GlobalEventCollector
+
+// NOTE this practice is bad, find a better solution
+
+
+
 
 #endif /* RPLUTILS_H_ */

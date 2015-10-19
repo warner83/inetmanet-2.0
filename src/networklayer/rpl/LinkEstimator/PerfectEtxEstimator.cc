@@ -22,6 +22,11 @@ PerfectEtxEstimator::~PerfectEtxEstimator() {
     // TODO Auto-generated destructor stub
 }
 
+unsigned int PerfectEtxEstimator::addrToIndex(IPv6Address a){
+    unsigned int n = a.words()[3] & 0xFF;
+    return (n - 1) % topo.getNumNodes();
+}
+
 Coord PerfectEtxEstimator::getCoord(int index){
     cModule *mod = topo.getNode(index)->getModule();
 

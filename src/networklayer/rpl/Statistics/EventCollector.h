@@ -14,6 +14,8 @@
 
 #include <string.h>
 
+#include "IPv6ControlInfo.h"
+
 // Basic class for NODE event collector
 
 class INET_API EventCollector : public cSimpleModule  {
@@ -63,9 +65,6 @@ public:
     void initialize(int stage);
 
     void handleMessage(cMessage *msg);
-
-    // Set ID for stats storage
-    void setID(int i);
 
 };
 

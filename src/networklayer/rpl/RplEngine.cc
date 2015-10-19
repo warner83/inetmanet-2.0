@@ -117,7 +117,7 @@ void RplEngine::initialize(int stage)
         rt6->addRoutingProtocolRoute(route);
 
         // Assign my ID to the event collector
-        ec->setID(NODE_INDEX);
+        ec->setID(myIp);
 
     }
 }
@@ -255,7 +255,7 @@ void RplEngine::handleMessage(cMessage *msg)
                                 updateRoutingTable(preferredParent);
 
                                 // Signal event to EC
-                                ec->preferredParentChanged(addrToIndex(preferredParent));
+                                ec->preferredParentChanged(preferredParent);
                             }
 
                             // Updated rank ?

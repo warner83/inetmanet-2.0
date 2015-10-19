@@ -24,9 +24,9 @@ Define_Module(UDPSink);
 
 simsignal_t UDPSink::rcvdPkSignal = registerSignal("rcvdPk");
 
-static unsigned int addrToIndex(IPv6Address a){
+unsigned int UDPSink::addrToIndex(IPv6Address a){
     unsigned int n = a.words()[3] & 0xFF;
-    return n - 1 ;
+    return (n - 1) % topo.getNumNodes();
 }
 
 void UDPSink::initialize(int stage)
@@ -37,6 +37,8 @@ void UDPSink::initialize(int stage)
     {
         numReceived = 0;
         WATCH(numReceived);
+
+        topo.extractByProperty("node");
     }
 }
 

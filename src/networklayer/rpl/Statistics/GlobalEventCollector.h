@@ -59,6 +59,7 @@ class GlobalEventCollector: public EventCollector {
     void stableDodagStats();
 
 public:
+
     GlobalEventCollector();
     virtual ~GlobalEventCollector();
 
@@ -75,6 +76,9 @@ public:
 
     // The EC on the nodes use this function to recover pointer to the Sink
     UDPSink* getSink();
+
+    // The EC uses this function to retrieve the number of nodes in the system
+    unsigned int getNumNodes(){ return numNodes; }
 
     // Calculate the current cost to root, the EC of each node uses this function to evaluate the current cost
     double getPathToRoot(int node, std::list<int>& path);

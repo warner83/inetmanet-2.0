@@ -20,6 +20,9 @@ class PerfectEtxEstimator: public LinkEstimatorBase {
     // Retrieve node coordinates
     Coord getCoord(int index);
 
+    // Function to convert addresses to index
+    unsigned int addrToIndex(IPv6Address a);
+
 public:
     PerfectEtxEstimator();
     virtual ~PerfectEtxEstimator();

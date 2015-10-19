@@ -135,7 +135,9 @@ void NodeEventCollector::rankChanged(int newRank){
 
 }
 
-void NodeEventCollector::preferredParentChanged(int index){
+void NodeEventCollector::preferredParentChanged(IPv6Address pp){
+    unsigned int index = addrToIndex(pp);
+
     curPreferred = index;
 
     lastPreferredChanged = simTime();
@@ -242,4 +244,13 @@ void NodeEventCollector::nodeRoot(){
     // Root creates the DODAG, hence it is considered as part of the network already
     joined = true;
     gc->nodeJoined(id);
+}
+
+unsigned int NodeEventCollector::addrToIndex(IPv6Address a){
+    unsigned int n = a.words()[3] & 0xFF;
+    return (n - 1) % gc->getNumNodes();
+}
+
+void NodeEventCollector::setID(IPv6Address i){
+    id = addrToIndex(i);
 }

@@ -21,9 +21,9 @@
 Define_Module(GlobalEventCollector);
 
 GlobalEventCollector::GlobalEventCollector() {
-    topo.extractByProperty("node");
 
     numJoinedNodes = 0;
+
 }
 
 GlobalEventCollector::~GlobalEventCollector() {
@@ -78,10 +78,12 @@ void GlobalEventCollector::initialize(int stage){
         outDir = par("directory").stringValue();
         onlyOmnetStats = par("onlyOmnetStats").boolValue();
 
-    } else if( stage == 3 ){
-
+        // Get topolgy
+        topo.extractByProperty("node");
         // Get num nodes
         numNodes = topo.getNumNodes();
+
+    } else if( stage == 3 ){
 
         // Get pointers to modules
 
@@ -107,6 +109,10 @@ void GlobalEventCollector::initialize(int stage){
 
         // Get pointer to a phy module, for etx estimation, any phy will work, I pick the phy of the first node (hey you're gonna have at least one node in the network)
         phy = check_and_cast<Ieee802154Phy*> (topo.getNode(0)->getModule()->getSubmodule("wlan")->getSubmodule("phy"));
+
+        // Get pointer to UDPSink
+        cModule *mod = topo.getNode(rootNode)->getModule();
+        sink = check_and_cast<UDPSink *> (mod->getSubmodule("udpApp", 0));
 
         // Get topology information
 
@@ -228,11 +234,7 @@ void GlobalEventCollector::initialize(int stage){
 
     }
 
-    // Get pointer to UDPSink
-    cModule *mod = topo.getNode(rootNode)->getModule();
-    sink = check_and_cast<UDPSink *> (mod->getSubmodule("udpApp", 0));
-
-    EventCollector::initializeChannels(stage);
+    EventCollector::initialize(stage);
 }
 
 void GlobalEventCollector::saveMapToFile(std::string fileName){

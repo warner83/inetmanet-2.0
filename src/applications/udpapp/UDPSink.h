@@ -31,12 +31,17 @@
  */
 class INET_API UDPSink : public ApplicationBase
 {
+
+    cTopology topo;
+
   protected:
     UDPSocket socket;
     int numReceived;
     static simsignal_t rcvdPkSignal;
 
     std::map<unsigned int,unsigned int> received;
+
+    unsigned int addrToIndex(IPv6Address a);
 
   protected:
     virtual void processPacket(cPacket *msg);

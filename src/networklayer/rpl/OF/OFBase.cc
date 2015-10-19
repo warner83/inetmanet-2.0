@@ -41,11 +41,11 @@ void OFBase::printParentSet(){
 
     EV << "[OF] parent set size " << parent_size << endl;
     for(int i = 0; i < parent_size; ++i){
-        EV << "[OF] parent [" << i << "] " << parent_set[i].index << " cost " << parent_set[i].cost << endl;
+        EV << "[OF] parent [" << i << "] " << parent_set[i].addr << " cost " << parent_set[i].cost << endl;
     }
 
     if(preferred_parent != NULL){
-        EV << "[OF] preferred parent " << preferred_parent->index << endl;
+        EV << "[OF] preferred parent " << preferred_parent->addr << endl;
     } else {
         EV << "[OF] no preferred parent" << endl;
     }
@@ -58,15 +58,15 @@ bool OFBase::process_dio(IPv6Address srcAddr, DIOmessage *dioMessage) {
         return false;
 
     // Create temporary descriptor
-    struct parent np(dioMessage->getRank(), le->getLinkCost(srcAddr), 0, srcAddr, addrToIndex(srcAddr) );
+    struct parent np(dioMessage->getRank(), le->getLinkCost(srcAddr), 0, srcAddr/*, addrToIndex(srcAddr)*/ );
 
     // Evaluate final cost
     evaluateCost(&np);
 
-    EV << "[OF] processing dio from " << np.index << " rank " << np.rank << " cost " << np.cost << " link " << np.linkMetric <<endl;
+    EV << "[OF] processing dio from " << np.addr << " rank " << np.rank << " cost " << np.cost << " link " << np.linkMetric <<endl;
 
     if(preferred_parent != NULL)
-        EV << "[OF] preferred parent " << preferred_parent->index << " rank " << preferred_parent->cost << endl;
+        EV << "[OF] preferred parent " << preferred_parent->addr << " rank " << preferred_parent->cost << endl;
 
     bool ret = false;
 
@@ -110,7 +110,7 @@ bool OFBase::process_dio(IPv6Address srcAddr, DIOmessage *dioMessage) {
     // Check if the rank changed
     if(newRank != myrank){
 
-        EV << "[OF] got new rank " << newRank << " was " << myrank << " preferred " << preferred_parent->index << endl;
+        EV << "[OF] got new rank " << newRank << " was " << myrank << " preferred " << preferred_parent->addr << endl;
 
         myrank = newRank;
         ret = true;
