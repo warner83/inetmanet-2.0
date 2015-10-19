@@ -22,14 +22,9 @@ simple GlobalEventCollector {
 	    bool timeline = default(false);
         bool periodic = default(false);
         double period = default(100);
+        
+        bool onlyOmnetStats = default(false);
 	    
-	    @signal[firstAvgRank](type="long");
-        @statistic[firstARankMetric](title="average rank metric first dodag"; source="firstAvgRank"; record=vector,stats; interpolationmode=none);
-        
-        @signal[stableAvgRank](type="long");
-        @statistic[stableARankMetric](title="average rank metric stable dodag"; source="stableAvgRank"; record=vector,stats; interpolationmode=none);
-        
-	    @signal[numNodes](type="long");
-        @statistic[numNodesMetric](title="number of network nodes"; source="numNodes"; record=vector,stats; interpolationmode=none);
-              
+	    @signal[*](type=long); 
+		@statisticTemplate[rplStats](record=mean,vector, histogram, stats);
 }

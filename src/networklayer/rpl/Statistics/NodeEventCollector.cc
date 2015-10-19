@@ -58,22 +58,16 @@ void NodeEventCollector::initialize(int stage){
         periodic = par("periodic").boolValue();
         period = par("period").doubleValue();
         outDir = par("directory").stringValue();
+        onlyOmnetStats = par("onlyOmnetStats").boolValue();
 
     } else if( stage == 1 ){
-        // Register signals
-        rankSignal = registerSignal("rank");
-        shortestCostSignal = registerSignal("shortestCost");
-        minHopsSignal = registerSignal("minHops");
-
+        // Retrieve the pointer to the Global Event Collector
         gc = check_and_cast<GlobalEventCollector *> (getParentModule()->getParentModule()->getParentModule()->getParentModule()->getSubmodule("globalStats"));
 
     } else if( stage == 4 ){
         // It is assumed that the global collector has been initialized
 
-        emit(shortestCostSignal, shortestCost);
-        emit(minHopsSignal, minHops);
-
-        // Get app pointer
+        // Get app pointers
 
         // Get sink
         sink = gc->getSink();
@@ -208,7 +202,36 @@ void NodeEventCollector::logStat(std::string status){
         finalValue(status+"_app_pkt_loss", pktLossRatio);
     }
 
+}
 
+void NodeEventCollector::periodicStatCollection(){
+
+    if(!isRoot && app != NULL){
+        // If I have an app evaluate stats
+
+        // Recv data
+        unsigned int recvPktDiff = sink->getNumPktRecv(id) - recvPkt;
+        recvPkt = sink->getNumPktRecv(id);
+        // Sent data
+        unsigned int sentPktDiff = app->getSentPkt() - sentPkt;
+        sentPkt = app->getSentPkt();
+        // Loss ratio
+        pktLossRatio = 1 - ( (double) recvPktDiff / sentPktDiff );
+
+        tracePeriodicValue("pkt_loss", pktLossRatio);
+    }
+
+    if(curCost >= 0){ // Negative cost -> disconnected network
+
+        tracePeriodicValue("routing_shortest_stretch", curCost - shortestCost);
+
+        tracePeriodicValue("rank", curRank );
+    } else {
+        // Print -1, disconnected node
+        tracePeriodicValue("routing_shortest_stretch", -1);
+    }
+
+    tracePeriodicValue("rplPktSent", numSentDios );
 
 }
 

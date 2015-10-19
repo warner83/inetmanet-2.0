@@ -21,13 +21,6 @@ class UDPSink;
 
 class GlobalEventCollector: public EventCollector {
 
-    //////////// Signals /////////////
-
-    simsignal_t firstAvgRankSignal; // Average node rank
-    simsignal_t stableAvgRankSignal; // Average node rank
-
-    simsignal_t numNodesSignal; // Num nodes in the network
-
     //////////// Pointers to simulation modules /////////////
 
     // Topology structure
@@ -54,6 +47,8 @@ class GlobalEventCollector: public EventCollector {
     //////////// Stats Functions /////////////
 
     void logStat(std::string status);
+
+    virtual void periodicStatCollection();
 
     void saveMapToFile(std::string fileName);
 

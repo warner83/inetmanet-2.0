@@ -76,17 +76,12 @@ void GlobalEventCollector::initialize(int stage){
         periodic = par("periodic").boolValue();
         period = par("period").doubleValue();
         outDir = par("directory").stringValue();
+        onlyOmnetStats = par("onlyOmnetStats").boolValue();
 
     } else if( stage == 3 ){
-        // Register signals
-        firstAvgRankSignal = registerSignal("firstAvgRank");
-        stableAvgRankSignal = registerSignal("stableAvgRank");
-
-        numNodesSignal = registerSignal("numNodes");
 
         // Get num nodes
         numNodes = topo.getNumNodes();
-        emit(numNodesSignal, numNodes);
 
         // Get pointers to modules
 
@@ -389,9 +384,9 @@ void GlobalEventCollector::logStat(std::string status){
 
     finalValue(status+"_total_pkt_loss", totalPktLossRatio);
 
+}
 
-    //emit(stableAvgRankSignal, avgRank);
-    //emit(firstAvgRankSignal, avgRank);
-
+void GlobalEventCollector::periodicStatCollection(){
+    // Nothing to do here so far
 }
 

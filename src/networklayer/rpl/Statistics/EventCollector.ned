@@ -24,4 +24,6 @@ moduleinterface EventCollector {
         double period;
         
         string directory;
+        
+        bool onlyOmnetStats;
 }

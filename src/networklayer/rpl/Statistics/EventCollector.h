@@ -18,6 +18,8 @@
 
 class INET_API EventCollector : public cSimpleModule  {
 
+    cMessage *periodic_collection;
+
 protected:
 
     //////////// Utility data       /////////////
@@ -27,7 +29,12 @@ protected:
     bool timeline; // True if stat timeline is active
     bool periodic; // True if stat periodic collection is active
     double period; // Period for periodic stat collection
+    bool onlyOmnetStats; // True if stat has to be saved only in omnetpp format
+
     int id; // Module ID
+
+    // Omnetpp signals
+    std::map<std::string, simsignal_t> statSignals;
 
     //////////// Utility functions /////////////
 
@@ -40,11 +47,22 @@ protected:
     // Store final value
     void finalValue(std::string metric, double value, int id2 = -1);
 
+    // Register a new signal
+    void registerRplStatSignal(std::string name);
+
+    // Return true if a signal has been registered
+    bool registeredRplStatSignal(std::string name);
+
+    // Called periodically if periodic stat collection is enabled
+    virtual void periodicStatCollection() {}
+
 public:
     EventCollector();
     virtual ~EventCollector();
 
     void initialize(int stage);
+
+    void handleMessage(cMessage *msg);
 
     // Set ID for stats storage
     void setID(int i);

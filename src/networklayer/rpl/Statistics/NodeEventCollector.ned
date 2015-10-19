@@ -19,16 +19,13 @@ simple NodeEventCollector {
 	parameters:
 	    
 	    string directory = default("/mnt/ram/");
-	    bool timeline = default(false);
-        bool periodic = default(false);
+	    bool timeline = default(true);
+        bool periodic = default(true);
         double period = default(100);
+        
+        bool onlyOmnetStats = default(false);
 	    
-        @signal[rank](type="long");
-        @statistic[rankMetric](title="current rank"; source="rank"; record=vector,stats; interpolationmode=none);
-        
-      	@signal[shortestCost](type="long");
-        @statistic[shortestCostMetric](title="shortest cost"; source="shortestCost"; record=vector,stats; interpolationmode=none);
-        
-      	@signal[minHops](type="long");
-        @statistic[minHopsMetric](title="minimum number of hops to root"; source="minHops"; record=vector,stats; interpolationmode=none);
+	    @signal[*](type=long); 
+		@statisticTemplate[rplStats](record=mean,vector, histogram, stats);
+	    
 }
