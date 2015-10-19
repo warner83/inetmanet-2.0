@@ -26,7 +26,7 @@ for r in $reset_time; do
 	      for p in $parent_set; do
 		  for m in $Max_I; do
 		    for t in $trickle_types; do
-			mkdir -p ../../data_uniform_100/data_$t
+			mkdir -p ../../../../data_uniform_100/data_$t
 			mkdir -p /mnt/ram/uniform_100
 			if [ ! -d "../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}" ]; then
 			    echo **.minInt = $I > params.ini
@@ -40,7 +40,7 @@ for r in $reset_time; do
 			    echo "$CUR_DIR/omnetpp_bin/opp_runall -j 4 $CUR_DIR/omnetpp_bin/opp_run_release -r 1..100 -u Cmdenv  -n ../..:../../../src -l ../../../src/inet omnetpp.ini"
 			    opp_runall -j4 opp_run_release -r 1..100 -u Cmdenv  -n ../..:../../../src -l ../../../src/inet omnetpp.ini
 
-			    mkdir ../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
+			    mkdir ../../../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
 			    mv /mnt/ram/uniform_100/*.log ../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
 			fi
 		    done

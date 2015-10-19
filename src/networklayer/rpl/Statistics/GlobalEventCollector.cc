@@ -302,6 +302,7 @@ void GlobalEventCollector::logStat(std::string status){
     simtime_t max_stable = 0; // The stable time is the time when the last PP change happened in the network
     unsigned int max_rank = 0;
     double max_cost = 0;
+    double max_shift = 0;
     for(int i = 0; i < numNodes; ++i){
         if( max_stable < nodeCollectors[i]->lastPreferredChanged ){
             max_stable = nodeCollectors[i]->lastPreferredChanged;
@@ -315,6 +316,10 @@ void GlobalEventCollector::logStat(std::string status){
             max_cost = nodeCollectors[i]->curCost;
         }
 
+        if( max_shift < abs(nodeCollectors[0]->intervalInit - nodeCollectors[i]->intervalInit)){
+            max_shift = abs(nodeCollectors[0]->intervalInit - nodeCollectors[i]->intervalInit);
+        }
+
     }
 
     if(status.compare("first") == 0)
@@ -325,7 +330,7 @@ void GlobalEventCollector::logStat(std::string status){
 
     finalValue(status+"_totalMaxRank", max_rank);
     finalValue(status+"_totalMaxCost", max_cost);
-
+    finalValue(status+"_max_shift", max_shift);
 
     // Get totals from all the nodes
 

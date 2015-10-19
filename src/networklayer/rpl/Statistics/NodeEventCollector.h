@@ -47,6 +47,7 @@ class INET_API NodeEventCollector : public EventCollector {
     unsigned int curRank;
     double curCost;
     unsigned int numGlobalReset;
+    simtime_t intervalInit;
 
     // Application level stats
     UDPSink* sink;

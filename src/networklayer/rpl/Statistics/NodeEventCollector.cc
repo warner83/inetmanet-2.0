@@ -99,6 +99,7 @@ void NodeEventCollector::intervalBegin(double i){
 
     curInt = i;
     numInt++;
+    intervalInit = simTime();
 }
 
 void NodeEventCollector::messageSuppressed(){
@@ -176,6 +177,7 @@ void NodeEventCollector::logStat(std::string status){
     finalValue(status+"_i_size", curInt);
     finalValue(status+"_i_doubled", numIntDoubled);
     finalValue(status+"_suppressed_dio", numSuppressedDios);
+    finalValue(status+"_shift", abs(gc->getIntervalReference() - intervalInit) );
 
     if(curCost >= 0){ // Negative cost -> disconnected network
 

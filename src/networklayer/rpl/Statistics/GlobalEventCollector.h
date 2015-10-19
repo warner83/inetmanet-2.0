@@ -83,6 +83,11 @@ public:
     // Calculate the current cost to root, the EC of each node uses this function to evaluate the current cost
     double getPathToRoot(int node, std::list<int>& path);
     double getPathToRoot(int node);
+
+    // The EC uses this function to retrieve the interval begin of the root node and evaluate the shift
+    double getIntervalReference() { return nodeCollectors[0]->intervalInit; }
+
+    // TODO remove these interface functions towards the NodeCollector and make it friend
 };
 
 #endif /* GLOBALEVENTCOLLECTOR_H_ */
