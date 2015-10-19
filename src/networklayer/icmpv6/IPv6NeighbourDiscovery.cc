@@ -2712,6 +2712,8 @@ void IPv6NeighbourDiscovery::addNeighbour(const IPv6Address& addr, int interface
 
     // Force reachability
     n->reachabilityState = IPv6NeighbourCache::REACHABLE;
+
+    n->reachabilityExpires = SimTime::getMaxTime(); // This timer does not have to expire, every time I reset it to the largest value possible
 }
 
 bool IPv6NeighbourDiscovery::canServeWirelessNodes(InterfaceEntry *ie)

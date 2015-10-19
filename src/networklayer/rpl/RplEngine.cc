@@ -38,15 +38,22 @@
 Define_Module(RplEngine);
 
 RplEngine::RplEngine() {
-    // Nothing to do here
+    init_timer = NULL;
+    reset_timer = NULL;
+    of = NULL;
+    le = NULL;
 }
 
 RplEngine::~RplEngine() {
-    cancelAndDelete(init_timer);
-    cancelAndDelete(reset_timer);
+    if( init_timer != NULL )
+        cancelAndDelete(init_timer);
+    if( reset_timer != NULL )
+        cancelAndDelete(reset_timer);
 
-    delete of;
-    delete le;
+    if( of != NULL )
+        delete of;
+    if( le != NULL )
+        delete le;
 }
 
 void RplEngine::initialize(int stage)
