@@ -22,7 +22,7 @@ moduleinterface ITrickle
 {
     parameters:
             @display("i=block/cogwheel_s");
-            double minInt;
+            int minInt; // Expressed in 2^minInt ms
 			int redundancy;
 			int maxDoublings;
 			

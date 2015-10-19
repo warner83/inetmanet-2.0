@@ -41,7 +41,7 @@ void TrickleNormal::initialize(int stage)
         trickle_message_timer = new cMessage();
         trickle_message_timer->setKind(trickle_message_timer_kind_self_message);
 
-        minInt = par("minInt").doubleValue();
+        minInt = (pow(2, par("minInt").doubleValue())) / 1000;
         maxDoublings = par("maxDoublings").doubleValue();
         redundancy = par("redundancy").doubleValue();
 

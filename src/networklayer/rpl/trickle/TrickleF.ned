@@ -24,7 +24,7 @@ simple TrickleF like ITrickle
 {
        parameters:
             @display("i=block/cogwheel_s");
-            double minInt @unit("s") = default(8ms);
+            int minInt = default(3); // Expressed in 2^minInt ms
 			int redundancy = default(8);
 			int maxDoublings = default(20);
 					
