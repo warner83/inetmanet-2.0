@@ -102,7 +102,7 @@ void NodeEventCollector::intervalBegin(double i){
     intervalInit = simTime();
 
     traceValue("shift", fabs(gc->getIntervalReference().dbl() - intervalInit.dbl()));
-    traceValue("i_size", curInt);
+    traceValue("i_size", curInt );
 }
 
 void NodeEventCollector::messageSuppressed(){
@@ -183,6 +183,8 @@ void NodeEventCollector::logStat(std::string status){
     finalValue(status+"_i_size", curInt);
     finalValue(status+"_i_doubled", numIntDoubled);
     finalValue(status+"_suppressed_dio", numSuppressedDios);
+    if( numInt > 0 )
+        finalValue(status+"_dio_txprob", 1 - ( numSuppressedDios / numInt ) );
 
     if( curInt == 0 ){
         // This is the last node joining, Trickle is not initialized yet
