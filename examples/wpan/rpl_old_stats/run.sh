@@ -41,7 +41,7 @@ for r in $reset_time; do
 			    opp_runall -j4 opp_run_release -r 1..100 -u Cmdenv  -n ../..:../../../src -l ../../../src/inet omnetpp.ini
 
 			    mkdir ../../../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
-			    mv /mnt/ram/uniform_100/*.log ../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
+			    mv /mnt/ram/uniform_100/*.log ../../../../data_uniform_100/data_${t}/${I}_${k}_${p}_${r}_${m}
 			fi
 		    done
 		  done

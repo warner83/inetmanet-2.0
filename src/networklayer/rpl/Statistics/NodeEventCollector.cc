@@ -100,6 +100,9 @@ void NodeEventCollector::intervalBegin(double i){
     curInt = i;
     numInt++;
     intervalInit = simTime();
+
+    traceValue("shift", fabs(gc->getIntervalReference().dbl() - intervalInit.dbl()));
+    traceValue("i_size", curInt);
 }
 
 void NodeEventCollector::messageSuppressed(){
@@ -172,12 +175,23 @@ void NodeEventCollector::stableDodagStats(){
 }
 
 void NodeEventCollector::logStat(std::string status){
+    finalValue(status+"_rank", curRank);
+    finalValue(status+"_cost", curCost);
+
     finalValue(status+"_rplRecv", numRecvDios);
     finalValue(status+"_rplSend", numSentDios);
     finalValue(status+"_i_size", curInt);
     finalValue(status+"_i_doubled", numIntDoubled);
     finalValue(status+"_suppressed_dio", numSuppressedDios);
-    finalValue(status+"_shift", abs(gc->getIntervalReference() - intervalInit) );
+
+    if( curInt == 0 ){
+        // This is the last node joining, Trickle is not initialized yet
+        finalValue(status+"_shift", fabs(gc->getIntervalReference().dbl() - simTime().dbl()) );
+        finalValue(status+"_relative_shift", fabs(gc->getIntervalReference().dbl() - simTime().dbl()) / gc->getIntervalSizeReference() );
+    } else {
+        finalValue(status+"_shift", fabs(gc->getIntervalReference().dbl() - intervalInit.dbl()) );
+        finalValue(status+"_relative_shift", fabs(gc->getIntervalReference().dbl() - intervalInit.dbl()) / gc->getIntervalSizeReference() );
+    }
 
     if(curCost >= 0){ // Negative cost -> disconnected network
 

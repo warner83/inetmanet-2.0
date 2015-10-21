@@ -316,8 +316,15 @@ void GlobalEventCollector::logStat(std::string status){
             max_cost = nodeCollectors[i]->curCost;
         }
 
-        if( max_shift < abs(nodeCollectors[0]->intervalInit - nodeCollectors[i]->intervalInit)){
-            max_shift = abs(nodeCollectors[0]->intervalInit - nodeCollectors[i]->intervalInit);
+        double curShift = 0;
+        if( nodeCollectors[i]->curInt == 0 )
+            // This is the last node joining, Trickle is not initialized yet
+            curShift = fabs(nodeCollectors[0]->intervalInit.dbl() - simTime().dbl() );
+        else
+            curShift = fabs(nodeCollectors[0]->intervalInit.dbl() - nodeCollectors[i]->intervalInit.dbl());
+
+        if( max_shift < curShift ){
+            max_shift = curShift;
         }
 
     }
@@ -331,6 +338,7 @@ void GlobalEventCollector::logStat(std::string status){
     finalValue(status+"_totalMaxRank", max_rank);
     finalValue(status+"_totalMaxCost", max_cost);
     finalValue(status+"_max_shift", max_shift);
+    finalValue(status+"_max_relative_shift", max_shift / nodeCollectors[0]->curInt );
 
     // Get totals from all the nodes
 
@@ -397,3 +405,12 @@ void GlobalEventCollector::periodicStatCollection(){
     // Nothing to do here so far
 }
 
+simtime_t GlobalEventCollector::getIntervalReference() 
+{ 
+    return nodeCollectors[0]->intervalInit; 
+}
+
+simtime_t GlobalEventCollector::getIntervalSizeReference()
+{
+    return nodeCollectors[0]->curInt;
+}

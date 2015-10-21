@@ -196,7 +196,11 @@ void RplEngine::handleMessage(cMessage *msg)
                 ec->dioReceived(dioMessage);
 
                 if( !isRoot ){
+
                     // Root node ignores DIO messages!
+
+                    bool rankChanged = false;
+                    bool ppChanged = false;
 
                     if( dodagID.compare(IPv6Address::UNSPECIFIED_ADDRESS) == 0 ){
                         // The node still has not joined any DODAG
@@ -254,8 +258,8 @@ void RplEngine::handleMessage(cMessage *msg)
                                 // Update the routing table
                                 updateRoutingTable(preferredParent);
 
-                                // Signal event to EC
-                                ec->preferredParentChanged(preferredParent);
+                                ppChanged = true;
+
                             }
 
                             // Updated rank ?
@@ -263,8 +267,7 @@ void RplEngine::handleMessage(cMessage *msg)
                                 // Update rank
                                 rank = of->getRank();
 
-                                // Signal event to EC
-                                ec->rankChanged(rank);
+                                rankChanged = true;
                             }
 
                             EV << "[RPL] Inconsistency detected, DODAGID " << dodagID.str() << " DODAG VERSION " << dodagVersion << " rank " << rank << " preferred parent " << preferredParent.str() << endl;
@@ -286,6 +289,15 @@ void RplEngine::handleMessage(cMessage *msg)
                         signalTrickle(rpl_init);
 
                     }
+
+                    // Stats collection
+                    if( rankChanged )
+                        // Signal event to EC
+                        ec->rankChanged(rank);
+
+                    if( ppChanged )
+                        // Signal event to EC
+                        ec->preferredParentChanged(preferredParent);
                 }
 
             } else {

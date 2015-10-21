@@ -84,8 +84,9 @@ public:
     double getPathToRoot(int node, std::list<int>& path);
     double getPathToRoot(int node);
 
-    // The EC uses this function to retrieve the interval begin of the root node and evaluate the shift
-    double getIntervalReference() { return nodeCollectors[0]->intervalInit; }
+    // The EC uses this function to retrieve the interval begin and size of the root node and evaluate the shift
+    simtime_t getIntervalReference();
+    simtime_t getIntervalSizeReference();
 
     // TODO remove these interface functions towards the NodeCollector and make it friend
 };
