@@ -44,7 +44,6 @@ void TrickleNormal::initialize(int stage)
         minInt = (pow(2, par("minInt").doubleValue())) / 1000;
         maxDoublings = par("maxDoublings").doubleValue();
         redundancy = par("redundancy").doubleValue();
-
     }
 
     ITrickle::initialize(stage);

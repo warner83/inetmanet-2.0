@@ -80,6 +80,17 @@ void NodeEventCollector::initialize(int stage){
             app = NULL;
         }
 
+        // Print topology stats
+        unsigned int numNeigh = 0;
+        for (int j=0; j<gc->getNumNodes(); j++)
+        {
+            if( gc->getEtx(id,j) > 0 ){
+                finalValue("etx", gc->getEtx(id,j) , j);
+                numNeigh++;
+            }
+        }
+        finalValue("num_neighbors", numNeigh);
+
     }
 
     EventCollector::initialize(stage);
@@ -184,7 +195,7 @@ void NodeEventCollector::logStat(std::string status){
     finalValue(status+"_i_doubled", numIntDoubled);
     finalValue(status+"_suppressed_dio", numSuppressedDios);
     if( numInt > 0 )
-        finalValue(status+"_dio_txprob", 1 - ( numSuppressedDios / numInt ) );
+        finalValue(status+"_dio_txprob", 1 - ((double) numSuppressedDios / numInt ));
 
     if( curInt == 0 ){
         // This is the last node joining, Trickle is not initialized yet

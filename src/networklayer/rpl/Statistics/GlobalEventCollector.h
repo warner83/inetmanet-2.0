@@ -88,6 +88,9 @@ public:
     simtime_t getIntervalReference();
     simtime_t getIntervalSizeReference();
 
+    // The EC uses this function to retrieve topology quality stats
+    double getEtx(unsigned int i, unsigned int j){ return etx[i][j]; }
+
     // TODO remove these interface functions towards the NodeCollector and make it friend
 };
 

@@ -291,13 +291,14 @@ void RplEngine::handleMessage(cMessage *msg)
                     }
 
                     // Stats collection
-                    if( rankChanged )
-                        // Signal event to EC
-                        ec->rankChanged(rank);
-
+                    // First the PP change then the rank (change in rank triggers a path to root cost computation that requires the PP to be set first)
                     if( ppChanged )
                         // Signal event to EC
                         ec->preferredParentChanged(preferredParent);
+
+                    if( rankChanged )
+                        // Signal event to EC
+                        ec->rankChanged(rank);
                 }
 
             } else {
