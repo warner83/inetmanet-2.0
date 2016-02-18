@@ -117,6 +117,7 @@ class INET_API RplEngine : public cSimpleModule {
     ///////////  Trickle event signal functions  ///////////
 
     void signalTrickle(int kind);
+    void signalTrickle(cMessage* msg);
 
 public:
     RplEngine();

@@ -202,6 +202,8 @@ void ObstacleControl::add(Obstacle obstacle) {
     cacheEntries.clear();
 }
 
+
+
 void ObstacleControl::erase(const Obstacle* obstacle) {
     for (Obstacles::iterator i = obstacles.begin(); i != obstacles.end(); ++i) {
         for (ObstacleGridRow::iterator j = i->begin(); j != i->end(); ++j) {
@@ -220,6 +222,19 @@ void ObstacleControl::erase(const Obstacle* obstacle) {
     delete obstacle;
 
     cacheEntries.clear();
+}
+
+bool ObstacleControl::inObstacle(Coord c){
+    size_t x = std::max(0, int(c.x / GRIDCELL_SIZE));
+    size_t y = std::max(0, int(c.y / GRIDCELL_SIZE));
+
+    if( y >= obstacles.size() ||  x >= obstacles[y].size() )
+        return false;
+
+    if( obstacles[y][x].size() > 0 )
+        return true;
+    else
+        return false;
 }
 
 double ObstacleControl::calculateReceivedPower(double pSend, double carrierFrequency, const Coord& senderPos, double senderAngle, const Coord& receiverPos, double receiverAngle) const {

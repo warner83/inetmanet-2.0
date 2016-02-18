@@ -13,30 +13,21 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
+package inet.mobility.static;
 
-#include "IPv6Address.h"
-#include "RPLmessage_m.h"
-
-}} 
-
-class noncobject IPv6Address;
-class noncobject RPLmessage;
+import inet.mobility.common.MobilityBase;
 
 
 //
-// DIO message representation
 //
-packet DIOmessage extends RPLmessage{
-    unsigned int RPLInstanceID;// 8 bit
-    unsigned int versionNumber; //8 bit
-    unsigned int rank; //16 bit
-    
-    // Modifications for TrickleS
-    //double senderIntervalSize;
-    //double senderTransmissionTime;
-    
-    // TODO add other fields
-    
-    IPv6Address DODAGID;
+simple ConnectedUniformMobility extends MobilityBase
+{
+    parameters:
+        int rootX @unit(m) = default(0m);
+        int rootY @unit(m) = default(0m);
+        int rootZ @unit(m) = default(0m);
+        double maxDistance @unit(m) = default(5m);
+        double minDistance @unit(m) = default(5m);
+        @class(ConnectedUniformMobility);
 }
+

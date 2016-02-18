@@ -382,6 +382,11 @@ void RplEngine::signalTrickle(int kind){
     send(msg, "trickleOut");
 }
 
+void RplEngine::signalTrickle(cMessage* msg){
+    // This version sends directly the message
+    send(msg, "trickleOut");
+}
+
 
 void RplEngine::sendDioOut(){
 

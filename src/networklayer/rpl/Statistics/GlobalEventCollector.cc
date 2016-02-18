@@ -85,6 +85,9 @@ void GlobalEventCollector::initialize(int stage){
 
     } else if( stage == 3 ){
 
+        // Save nodes position to file
+        saveMapToFile("map.dat");
+
         // Get pointers to modules
 
         rplEngines.resize(numNodes);
@@ -117,6 +120,7 @@ void GlobalEventCollector::initialize(int stage){
         // Get topology information
 
         // Collect ETX information
+
         etx.resize(numNodes);
 
         for (int i=0; i<numNodes; i++)
@@ -142,7 +146,9 @@ void GlobalEventCollector::initialize(int stage){
                 } else {
                     etx[i][j]=-1;
                 }
+
             }
+
         }
 
         // Evaluate shortest paths
@@ -183,8 +189,18 @@ void GlobalEventCollector::initialize(int stage){
                 }
             }
 
-           if( min_cost == INF )
+           if( min_cost == INF ){
+
+               EV << "ETX matrix:" << std::endl;
+               for (int i=0; i<numNodes; i++){
+                   for (int j=0; j<numNodes; j++){
+                       EV << etx[i][j] << " ";
+                   }
+                   EV << std::endl;
+               }
+
                 opp_error("Disconnected network");
+           }
 
            Q.erase(min);
 
@@ -228,9 +244,6 @@ void GlobalEventCollector::initialize(int stage){
             nodeCollectors[i]->minHops = min_hops[i];
 
         }
-
-        // Save nodes position to file
-        saveMapToFile("map.dat");
 
     }
 

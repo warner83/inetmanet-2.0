@@ -44,6 +44,7 @@ network csma802154net
             //config=xml("<config><interface hosts='*' address='145.236.x.x' netmask='255.255.0.0'/></config>");
             @display("p=166,65");
         }
+       
 
         globalStats: GlobalEventCollector;
     connections allowunconnected:

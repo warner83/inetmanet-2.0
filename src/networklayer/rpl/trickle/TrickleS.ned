@@ -13,30 +13,22 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
+package inet.networklayer.rpl.trickle;
 
-#include "IPv6Address.h"
-#include "RPLmessage_m.h"
-
-}} 
-
-class noncobject IPv6Address;
-class noncobject RPLmessage;
-
+import inet.networklayer.rpl.trickle.ITrickle;
 
 //
-// DIO message representation
+// TODO auto-generated type
 //
-packet DIOmessage extends RPLmessage{
-    unsigned int RPLInstanceID;// 8 bit
-    unsigned int versionNumber; //8 bit
-    unsigned int rank; //16 bit
-    
-    // Modifications for TrickleS
-    //double senderIntervalSize;
-    //double senderTransmissionTime;
-    
-    // TODO add other fields
-    
-    IPv6Address DODAGID;
+simple TrickleS like ITrickle
+{
+       parameters:
+            @display("i=block/cogwheel_s");
+            int minInt = default(3); // Expressed in 2^minInt ms
+			int redundancy = default(8);
+			int maxDoublings = default(20);
+					
+		gates:
+        	input engineIn;
+        	output engineOut;
 }

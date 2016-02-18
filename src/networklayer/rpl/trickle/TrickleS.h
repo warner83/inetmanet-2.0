@@ -13,30 +13,34 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
+#ifndef TRICKLES_H_
+#define TRICKLES_H_
 
-#include "IPv6Address.h"
-#include "RPLmessage_m.h"
+// Class implementing Trickle-S
 
-}} 
+#include <TrickleNormal.h>
 
-class noncobject IPv6Address;
-class noncobject RPLmessage;
+class TrickleS: public TrickleNormal {
+
+    // Number of suppressed DIO messages
+    int suppressedDIOs;
+
+    void initialize(int stage);
+
+    void intervalEnded();
+
+    // This function is added to handle TrickleS dynamics, that allows gaps between intervals
+    void intervalBegin();
+
+    void messageFired();
+
+    void initializeTrickle();
+
+public:
+    TrickleS();
+    virtual ~TrickleS();
 
 
-//
-// DIO message representation
-//
-packet DIOmessage extends RPLmessage{
-    unsigned int RPLInstanceID;// 8 bit
-    unsigned int versionNumber; //8 bit
-    unsigned int rank; //16 bit
-    
-    // Modifications for TrickleS
-    //double senderIntervalSize;
-    //double senderTransmissionTime;
-    
-    // TODO add other fields
-    
-    IPv6Address DODAGID;
-}
+};
+
+#endif /* TRICKLES_H_ */
